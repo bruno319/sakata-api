@@ -1,11 +1,11 @@
 table! {
-    cards (id) {
+    base_cards (id) {
         id -> Varchar,
         name -> Varchar,
         overall_power -> Tinyint,
         class -> Tinyint,
         genre -> Tinyint,
-        rarity -> Tinyint,
+        mal_id -> Integer,
         image -> Varchar,
     }
 }

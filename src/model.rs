@@ -5,7 +5,6 @@ use diesel::backend::Backend;
 use diesel::deserialize::FromSql;
 use diesel::serialize::{Output, ToSql};
 use diesel::sql_types::TinyInt;
-use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, FromSqlRow, AsExpression, Clone, Copy)]
@@ -58,17 +57,6 @@ pub enum Rarity {
 impl_tinyint_sql_op!(Class);
 impl_tinyint_sql_op!(Genre);
 impl_tinyint_sql_op!(Rarity);
-
-#[derive(Queryable, Serialize, Deserialize)]
-pub struct CharacterCard {
-    id: String,
-    name: String,
-    overall_power: i8,
-    class: Class,
-    genre: Genre,
-    rarity: Rarity,
-    image: String,
-}
 
 impl Default for Class {
     fn default() -> Self {
