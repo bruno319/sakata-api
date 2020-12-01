@@ -19,6 +19,22 @@ pub async fn get_cards(pool: web::Data<MysqlPool>) -> Result<HttpResponse, HttpR
     }
 }
 
+#[get("/basecards/{id}")]
+pub async fn get_card_by_id(
+    req: HttpRequest,
+    pool: web::Data<MysqlPool>) -> Result<HttpResponse, HttpResponse>{
+    let mysql_pool = mysql_pool_handler(pool)?;
+    let base_card_id: String = req.match_info().get("id")
+        .ok_or(HttpResponse::BadRequest().json("ID not provided"))?
+        .parse()
+        .map_err(|_| HttpResponse::BadRequest().json("ID must be a String"))?;
+
+    match BaseCardDao::find_by_id(&mysql_pool, base_card_id){
+        Ok(bc) => Ok(HttpResponse::Ok().json(bc)),
+        Err(e) => Err(HttpResponse::InternalServerError().json(e.to_string())),
+    }
+}
+
 #[post("/basecards")]
 pub async fn create_base_card(
     base_card_dto: web::Json<BaseCardDto>,

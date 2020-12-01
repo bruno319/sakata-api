@@ -30,6 +30,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_cards)
             .service(create_base_card)
             .service(generate_overall_power)
+            .service(get_card_by_id)
     })
         .bind("127.0.0.1:8080")
         .unwrap()
