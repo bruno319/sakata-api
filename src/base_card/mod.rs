@@ -1,12 +1,15 @@
+use std::thread;
+
 use jikan_rs::client::Jikan;
 use jikan_rs::prelude::{Anime, Character};
-use log::info;
+use log::*;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::dto::BaseCardDto;
 use crate::model::{Class, Genre};
 use crate::schema::base_cards;
+use std::time::Duration;
 
 mod dao;
 pub mod handlers;
@@ -30,12 +33,10 @@ impl BaseCard {
             .await
             .map_err(|e| format!("{:?}", e))?;
 
-        let overall_power = calc_overall_power(&jikan, &character).await?;
-
         let base_card = BaseCard {
             id: Uuid::new_v4().to_string(),
             name: character.name,
-            overall_power,
+            overall_power: dto.overall_power as i8,
             class: dto.class,
             genre: dto.genre,
             mal_id: dto.mal_id,
@@ -46,8 +47,18 @@ impl BaseCard {
     }
 }
 
-async fn calc_overall_power(jikan: &Jikan, character: &Character) -> Result<i8, String> {
-    let animes = find_animes_from_character(jikan, &character).await;
+pub async fn calc_overall_power(mal_id: u32, anime_mal_ids: Vec<u32>) -> Result<i8, String> {
+    let jikan = Jikan::new();
+    let character = jikan.find_character(mal_id)
+        .await
+        .map_err(|e| format!("{:?}", e))?;
+
+    let animes = if anime_mal_ids.is_empty() {
+        find_animes_from_character(&jikan, &character).await
+    } else {
+        find_animes_from_mal_id(&jikan, anime_mal_ids).await
+    };
+
     if animes.is_empty() {
         return Err(format!("No animes were found for character {}", character.name));
     }
@@ -57,7 +68,7 @@ async fn calc_overall_power(jikan: &Jikan, character: &Character) -> Result<i8, 
         .partition(|a| a.anime_type == "TV");
 
     for tv in &tv_series {
-        info!("{}: {:?}, {:?}", tv.title, tv.score, tv.members);
+        debug!("{}: {:?}, {:?}", tv.title, tv.score, tv.members);
     }
 
     let ov_fav = calc_overall_member_favorites(character.member_favorites);
@@ -67,7 +78,7 @@ async fn calc_overall_power(jikan: &Jikan, character: &Character) -> Result<i8, 
         (calc_overall_popularity(&movies), calc_overall_score(&movies))
     };
 
-    info!("{}. Favorites Overall: {}, Popularity Anime Overall: {}, Score Anime Overall: {}"
+    debug!("{}. Favorites Overall: {}, Popularity Anime Overall: {}, Score Anime Overall: {}"
           , character.name, ov_fav, ov_pop, ov_scr);
 
     let ov_power = ov_fav + ov_pop + ov_scr;
@@ -77,8 +88,25 @@ async fn calc_overall_power(jikan: &Jikan, character: &Character) -> Result<i8, 
 
 async fn find_animes_from_character(jikan: &Jikan, character: &Character) -> Vec<Anime> {
     let mut animes = vec![];
+    let request_times = character.animeography.len();
     for anime in &character.animeography {
         let anime_result = jikan.find_anime(anime.mal_id).await;
+        if anime_result.is_err() {
+            continue;
+        }
+        if request_times > 5 {
+            thread::sleep(Duration::from_secs(3));
+        }
+        let anime_result = anime_result.unwrap();
+        animes.push(anime_result);
+    };
+    animes
+}
+
+async fn find_animes_from_mal_id(jikan: &Jikan, mal_ids: Vec<u32>) -> Vec<Anime> {
+    let mut animes = vec![];
+    for id in mal_ids {
+        let anime_result = jikan.find_anime(id).await;
         if anime_result.is_err() {
             continue;
         }
