@@ -23,24 +23,17 @@ pub struct BaseCard {
     class: Class,
     genre: Genre,
     mal_id: i32,
-    image: String,
 }
 
 impl BaseCard {
     pub async fn new(dto: BaseCardDto) -> Result<BaseCard, String> {
-        let jikan = Jikan::new();
-        let character = jikan.find_character(dto.mal_id as u32)
-            .await
-            .map_err(|e| format!("{:?}", e))?;
-
         let base_card = BaseCard {
             id: Uuid::new_v4().to_string(),
-            name: character.name,
+            name: dto.name,
             overall_power: dto.overall_power as i8,
             class: dto.class,
             genre: dto.genre,
             mal_id: dto.mal_id,
-            image: dto.image,
         };
 
         Ok(base_card)
@@ -66,10 +59,6 @@ pub async fn calc_overall_power(mal_id: u32, anime_mal_ids: Vec<u32>) -> Result<
     let (tv_series, movies): (Vec<Anime>, Vec<Anime>) = animes.into_iter()
         .filter(|a| a.anime_type == "TV" || a.anime_type == "Movie")
         .partition(|a| a.anime_type == "TV");
-
-    for tv in &tv_series {
-        debug!("{}: {:?}, {:?}", tv.title, tv.score, tv.members);
-    }
 
     let ov_fav = calc_overall_member_favorites(character.member_favorites);
     let (ov_pop, ov_scr) = if !tv_series.is_empty() {

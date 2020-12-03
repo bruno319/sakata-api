@@ -14,17 +14,15 @@ pub enum Class {
     Unknown = -1,
     Fighter = 1,
     Magician = 2,
-    Technician = 3,
-    Swordsman = 4,
-    Ranger = 5,
-    Support = 6,
-    Beast = 7,
-    Pilot = 8,
-    Supernatural = 9,
-    Scholar = 10,
-    Worker = 11,
-    Musician = 12,
-    Waifu = 13,
+    Swordsman = 3,
+    Ranger = 4,
+    Support = 5,
+    Beast = 6,
+    Machinist = 7,
+    Supernatural = 8,
+    Scholar = 9,
+    Worker = 10,
+    Musician = 11,
 }
 
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, AsExpression, FromSqlRow, Clone, Copy)]
@@ -40,7 +38,6 @@ pub enum Genre {
     SliceOfLife = 6,
     Comedy = 7,
     Romance = 8,
-    Ecchi = 9,
 }
 
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, AsExpression, FromSqlRow, Clone, Copy)]

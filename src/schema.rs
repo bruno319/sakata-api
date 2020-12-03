@@ -6,6 +6,5 @@ table! {
         class -> Tinyint,
         genre -> Tinyint,
         mal_id -> Integer,
-        image -> Varchar,
     }
 }

@@ -4,6 +4,5 @@ CREATE TABLE base_cards (
     overall_power TINYINT NOT NULL,
     class TINYINT NOT NULL,
     genre TINYINT NOT NULL,
-    mal_id INT NOT NULL,
-    image VARCHAR(255) NOT NULL
+    mal_id INT NOT NULL
 );

@@ -4,11 +4,11 @@ use crate::model::{Class, Genre};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct BaseCardDto {
+    pub name: String,
     pub class: Class,
     pub genre: Genre,
     pub mal_id: i32,
-    pub overall_power: u8,
-    pub image: String,
+    pub overall_power: u8
 }
 
 #[derive(Serialize, Deserialize, Debug)]
