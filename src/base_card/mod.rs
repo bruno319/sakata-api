@@ -1,23 +1,21 @@
 use std::thread;
+use std::time::Duration;
 
 use jikan_rs::client::Jikan;
 use jikan_rs::prelude::{Anime, Character};
 use log::*;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::dto::BaseCardDto;
 use crate::model::{Class, Genre};
 use crate::schema::base_cards;
-use std::time::Duration;
 
 mod dao;
 pub mod handlers;
 
-#[derive(Queryable, Insertable, Serialize, Deserialize)]
-#[table_name = "base_cards"]
+#[derive(Queryable, Identifiable, Insertable, Serialize, Deserialize)]
 pub struct BaseCard {
-    id: String,
+    id: Option<i32>,
     name: String,
     overall_power: i8,
     class: Class,
@@ -28,7 +26,7 @@ pub struct BaseCard {
 impl BaseCard {
     pub async fn new(dto: BaseCardDto) -> Result<BaseCard, String> {
         let base_card = BaseCard {
-            id: Uuid::new_v4().to_string(),
+            id: None,
             name: dto.name,
             overall_power: dto.overall_power as i8,
             class: dto.class,
@@ -68,7 +66,7 @@ pub async fn calc_overall_power(mal_id: u32, anime_mal_ids: Vec<u32>) -> Result<
     };
 
     debug!("{}. Favorites Overall: {}, Popularity Anime Overall: {}, Score Anime Overall: {}"
-          , character.name, ov_fav, ov_pop, ov_scr);
+           , character.name, ov_fav, ov_pop, ov_scr);
 
     let ov_power = ov_fav + ov_pop + ov_scr;
 

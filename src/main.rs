@@ -5,8 +5,6 @@ use actix_cors::Cors;
 use actix_web::{App, HttpServer};
 use actix_web::middleware::Logger;
 
-use base_card::handlers::*;
-
 use crate::dbconfig::connect;
 
 #[macro_use]
@@ -16,6 +14,9 @@ mod schema;
 mod dbconfig;
 mod dto;
 mod base_card;
+mod player;
+mod player_card;
+mod utils;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -27,10 +28,11 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .wrap(Cors::permissive())
             .data(connect())
-            .service(get_cards)
-            .service(create_base_card)
-            .service(generate_overall_power)
-            .service(get_card_by_id)
+            .service(base_card::handlers::get_cards)
+            .service(base_card::handlers::create_base_card)
+            .service(base_card::handlers::generate_overall_power)
+            .service(base_card::handlers::get_card_by_id)
+            .service(player::handlers::get_player_by_id)
     })
         .bind("127.0.0.1:8080")
         .unwrap()
