@@ -11,7 +11,9 @@ CREATE TABLE `base_cards` (
 
 CREATE TABLE `players` (
     `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
-    `nickname` VARCHAR(40) NOT NULL
+    `nickname` VARCHAR(40) NOT NULL,
+    `coins` SMALLINT NOT NULL,
+    `stardust` SMALLINT NOT NULL
 );
 
 CREATE TABLE `player_cards` (

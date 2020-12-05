@@ -11,7 +11,7 @@ table! {
 
 table! {
     player_cards (id) {
-        id -> Integer,
+        id -> Nullable<Integer>,
         base_card_id -> Integer,
         player_id -> Integer,
         rarity -> Tinyint,
@@ -21,8 +21,10 @@ table! {
 
 table! {
     players (id) {
-        id -> Integer,
+        id -> Nullable<Integer>,
         nickname -> Varchar,
+        coins -> Smallint,
+        stardust -> Smallint,
     }
 }
 

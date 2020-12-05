@@ -2,7 +2,7 @@ use actix_web::{get, HttpRequest, HttpResponse, post, Result, web};
 
 use crate::dbconfig::MysqlPool;
 use crate::dto::{AnimeIdsDto, BaseCardDto};
-use crate::utils::{http_res, mysql_pool_handler, extract_path_param};
+use crate::utils::{extract_path_param, http_res, mysql_pool_handler};
 
 use super::{BaseCard, calc_overall_power};
 use super::dao;
@@ -19,7 +19,7 @@ pub async fn get_cards(pool: web::Data<MysqlPool>) -> Result<HttpResponse, HttpR
 #[get("/basecards/{id}")]
 pub async fn get_card_by_id(
     req: HttpRequest,
-    pool: web::Data<MysqlPool>
+    pool: web::Data<MysqlPool>,
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
     let base_card_id: i32 = extract_path_param("id", &req)?;
@@ -40,7 +40,7 @@ pub async fn create_base_card(
         .await
         .map_err(|e| http_res::internal_server_error(&e.to_string()))?;
 
-    match dao::insert(&mysql_pool, &base_card) {
+    match dao::save(&mysql_pool, &base_card) {
         Ok(bc) => Ok(http_res::ok(bc)),
         Err(e) => Err(http_res::internal_server_error(&e.to_string())),
     }

@@ -1,9 +1,12 @@
 use std::thread;
 use std::time::Duration;
 
+use diesel::MysqlConnection;
 use jikan_rs::client::Jikan;
 use jikan_rs::prelude::{Anime, Character};
 use log::*;
+use rand::{Rng, thread_rng};
+use rand::prelude::SliceRandom;
 use serde::{Deserialize, Serialize};
 
 use crate::dto::BaseCardDto;
@@ -13,14 +16,14 @@ use crate::schema::base_cards;
 mod dao;
 pub mod handlers;
 
-#[derive(Queryable, Identifiable, Insertable, Serialize, Deserialize)]
+#[derive(Queryable, Identifiable, Insertable, Serialize, Deserialize, Debug)]
 pub struct BaseCard {
-    id: Option<i32>,
-    name: String,
-    overall_power: i8,
-    class: Class,
-    genre: Genre,
-    mal_id: i32,
+    pub id: Option<i32>,
+    pub name: String,
+    pub overall_power: i8,
+    pub class: Class,
+    pub genre: Genre,
+    pub mal_id: i32,
 }
 
 impl BaseCard {
@@ -143,4 +146,27 @@ fn calc_overall_score(animes: &Vec<Anime>) -> f32 {
         .sum::<f32>() / quantity as f32;
 
     (mean_score - 5.0) / 0.11
+}
+
+pub fn common_card(conn: &MysqlConnection) -> Result<BaseCard, String> {
+    let rand = thread_rng().gen_range(0, 100);
+    let (min_overall, max_overall) = if rand < 4 {
+        (90, 99)
+    } else if rand < 16 {
+        (80, 89)
+    } else {
+        (0, 79)
+    };
+
+    let range_cards = dao::list_by_overall_between((min_overall, max_overall), conn)
+        .map_err(|e| e.to_string())?
+        .into_iter()
+        .filter_map(|c| c)
+        .collect::<Vec<i32>>();
+
+    let card_id = range_cards.choose(&mut thread_rng())
+        .ok_or("No card returned from database")?;
+
+    dao::find_by_id(conn, *card_id)
+        .map_err(|e| e.to_string())
 }

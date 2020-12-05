@@ -1,7 +1,9 @@
-use actix_web::{HttpResponse, web, HttpRequest};
-use crate::dbconfig::{MysqlPool, MySqlPooledConnection};
-use serde_json::Value;
 use std::str::FromStr;
+
+use actix_web::{HttpRequest, HttpResponse, web};
+use serde_json::Value;
+
+use crate::dbconfig::{MysqlPool, MySqlPooledConnection};
 
 pub fn mysql_pool_handler(pool: web::Data<MysqlPool>) -> Result<MySqlPooledConnection, HttpResponse> {
     pool.get()
@@ -23,6 +25,7 @@ pub fn extract_path_param<T: FromStr>(param: &str, req: &HttpRequest) -> Result<
 pub mod http_res {
     use actix_web::HttpResponse;
     use serde::Serialize;
+
     use crate::utils::error_msg;
 
     pub fn ok<T: Serialize>(json: T) -> HttpResponse {
@@ -32,4 +35,4 @@ pub mod http_res {
     pub fn internal_server_error(msg: &str) -> HttpResponse {
         HttpResponse::InternalServerError().json(error_msg(msg))
     }
- }
+}
