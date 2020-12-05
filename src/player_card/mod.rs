@@ -24,12 +24,12 @@ pub struct PlayerCard {
 }
 
 impl PlayerCard {
-    pub fn new(player: &Player, base_card: &BaseCard) -> PlayerCard {
+    pub fn new(player: &Player, base_card: &BaseCard, rarity: Rarity) -> PlayerCard {
         PlayerCard {
             id: None,
             base_card_id: base_card.id.unwrap(),
             player_id: player.id.unwrap(),
-            rarity: generate_rarity(),
+            rarity,
             quantity: 1,
         }
     }
@@ -50,13 +50,10 @@ fn generate_rarity() -> Rarity {
 }
 
 pub fn add_to_collection(player: &Player, base_card: &BaseCard, conn: &MysqlConnection) -> Result<PlayerCard, String> {
-    debug!("{:?} {:?}", player, base_card);
-
     let player_cards = dao::find_by(player, base_card, conn);
-    debug!("{:?}", player_cards);
+    let rarity = generate_rarity();
 
     if let Ok(p_cards) = player_cards {
-        let rarity = generate_rarity();
         for mut pc in p_cards {
             if pc.rarity == rarity {
                 pc.quantity += 1;
@@ -67,7 +64,7 @@ pub fn add_to_collection(player: &Player, base_card: &BaseCard, conn: &MysqlConn
         }
     }
 
-    dao::save(&PlayerCard::new(player, base_card), conn)
+    dao::save(&PlayerCard::new(player, base_card, rarity), conn)
         .map(|pc| *pc)
         .map_err(|e| e.to_string())
 }

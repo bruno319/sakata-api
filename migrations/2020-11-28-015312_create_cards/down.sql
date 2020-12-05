@@ -1,2 +1,3 @@
--- This file should undo anything in `up.sql`
-DROP TABLE base_cards;
+DROP TABLE IF EXISTS player_cards;
+DROP TABLE IF EXISTS players;
+DROP TABLE IF EXISTS base_cards;

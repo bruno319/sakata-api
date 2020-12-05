@@ -1,4 +1,4 @@
-use diesel::{BelongingToDsl, BoolExpressionMethods, ExpressionMethods, MysqlConnection, QueryDsl, RunQueryDsl};
+use diesel::{BoolExpressionMethods, ExpressionMethods, MysqlConnection, QueryDsl, RunQueryDsl};
 use diesel::result::Error;
 
 use crate::base_card::BaseCard;
@@ -20,8 +20,8 @@ pub fn find_by(player: &Player, base_card: &BaseCard, conn: &MysqlConnection) ->
     use crate::schema::player_cards::columns::player_id;
 
     player_cards
-        .filter(base_card_id.eq(base_card.id.unwrap_or_default())
-            .and(player_id.eq(player.id.unwrap())))
+        .filter(base_card_id.eq(base_card.id.unwrap()).and(player_id.eq(player.id.unwrap())))
+        .limit(4)
         .load(conn)
 }
 
