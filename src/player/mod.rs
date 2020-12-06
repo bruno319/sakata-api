@@ -16,12 +16,14 @@ pub struct Player {
     pub nickname: String,
     pub coins: i16,
     pub stardust: i16,
+    pub discord_id: i64,
 }
 
 impl Player {
     pub fn new(dto: PlayerDto) -> Player {
         Player {
             id: None,
+            discord_id: dto.discord_id,
             nickname: dto.nickname,
             coins: 300,
             stardust: 0,

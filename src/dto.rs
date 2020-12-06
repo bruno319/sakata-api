@@ -14,6 +14,7 @@ pub struct BaseCardDto {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PlayerDto {
     pub nickname: String,
+    pub discord_id: i64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

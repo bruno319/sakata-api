@@ -25,6 +25,7 @@ table! {
         nickname -> Varchar,
         coins -> Smallint,
         stardust -> Smallint,
+        discord_id -> Bigint,
     }
 }
 

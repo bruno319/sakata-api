@@ -1,7 +1,6 @@
 use std::env;
 
 use diesel::MysqlConnection;
-use log::*;
 use rand::{Rng, thread_rng};
 use serde::{Deserialize, Serialize};
 
@@ -80,7 +79,7 @@ pub struct PlayerCardResponse {
 
 impl PlayerCardResponse {
     pub fn new(player_card: &PlayerCard, base_card: &BaseCard) -> PlayerCardResponse {
-        let image_name = format!("{}[{}].jpg", base_card.mal_id, player_card.rarity as i8);
+        let image_name = format!("sakata_{}[{}].jpg", base_card.mal_id, player_card.rarity as i8);
         let image_url = format!("{}/{}", env::var("IMAGE_BASEURL").unwrap_or_default(), image_name);
 
         PlayerCardResponse {
