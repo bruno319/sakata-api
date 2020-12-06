@@ -5,7 +5,7 @@ use rand::{Rng, thread_rng};
 use serde::{Deserialize, Serialize};
 
 use crate::base_card::BaseCard;
-use crate::model::Rarity;
+use crate::model::{Rarity, Class, Genre};
 use crate::player::Player;
 use crate::schema::player_cards;
 
@@ -73,19 +73,23 @@ pub struct PlayerCardResponse {
     pub card_id: i32,
     pub name: String,
     pub rarity: Rarity,
+    pub class: Class,
+    pub genre: Genre,
     pub image_url: String,
     pub quantity: i8,
 }
 
 impl PlayerCardResponse {
     pub fn new(player_card: &PlayerCard, base_card: &BaseCard) -> PlayerCardResponse {
-        let image_name = format!("sakata_{}[{}].jpg", base_card.mal_id, player_card.rarity as i8);
+        let image_name = format!("sakata_{}[{}].jpeg", base_card.mal_id, player_card.rarity as i8);
         let image_url = format!("{}/{}", env::var("IMAGE_BASEURL").unwrap_or_default(), image_name);
 
         PlayerCardResponse {
             card_id: base_card.id.unwrap_or_default(),
             name: base_card.name.clone(),
             rarity: player_card.rarity,
+            class: base_card.class,
+            genre: base_card.genre,
             image_url,
             quantity: player_card.quantity,
         }

@@ -37,15 +37,15 @@ pub async fn create_player(
     }
 }
 
-#[get("/players/{id}/common-card")]
+#[get("/players/{discord_id}/common-card")]
 pub async fn buy_common_card(
     req: HttpRequest,
     pool: web::Data<MysqlPool>,
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
-    let player_id: i32 = extract_path_param("id", &req)?;
+    let player_id: i64 = extract_path_param("discord_id", &req)?;
 
-    let mut player = dao::find_by_id(&mysql_pool, player_id)
+    let mut player = dao::find_by_discord_id(&mysql_pool, player_id)
         .map_err(|e| http_res::internal_server_error(&e.to_string()))?;
 
     let base_card = player.buy_common_card(&mysql_pool)

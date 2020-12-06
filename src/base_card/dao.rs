@@ -22,7 +22,8 @@ pub fn list_by_overall_between((min, max): (i32, i32), conn: &MysqlConnection) -
 pub fn find_by_id(conn: &MysqlConnection, id: i32) -> Result<BaseCard, Error> {
     use crate::schema::base_cards;
 
-    base_cards::table.find(id)
+    base_cards::table
+        .find(id)
         .first(conn)
 }
 

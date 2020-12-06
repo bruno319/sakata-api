@@ -72,3 +72,51 @@ impl Default for Rarity {
         Rarity::Unknown
     }
 }
+
+
+impl ToString for Rarity {
+    fn to_string(&self) -> String {
+        match self {
+            Rarity::Silver => "Silver".to_string(),
+            Rarity::Gold => "Gold".to_string(),
+            Rarity::Epic => "Epic".to_string(),
+            Rarity::Legend => "Legend".to_string(),
+            _ => "".to_string()
+        }
+    }
+}
+
+impl ToString for Class {
+    fn to_string(&self) -> String {
+        match self {
+            Class::Fighter => "Fighter".to_string(),
+            Class::Magician => "Magician".to_string(),
+            Class::Swordsman => "Swordsman".to_string(),
+            Class::Ranger => "Ranger".to_string(),
+            Class::Support => "Support".to_string(),
+            Class::Beast => "Beast".to_string(),
+            Class::Machinist => "Machinist".to_string(),
+            Class::Supernatural => "Supernatural".to_string(),
+            Class::Scholar => "Scholar".to_string(),
+            Class::Worker => "Worker".to_string(),
+            Class::Musician => "Musician".to_string(),
+            Class::Unknown => "".to_string(),
+        }
+    }
+}
+
+impl ToString for Genre {
+    fn to_string(&self) -> String {
+        match self {
+            Genre::Action => "Action".to_string(),
+            Genre::Adventure => "Adventure".to_string(),
+            Genre::SciFi => "Sci-Fi".to_string(),
+            Genre::Sports => "Sports".to_string(),
+            Genre::Mystery => "Mystery".to_string(),
+            Genre::SliceOfLife => "Slice of Life".to_string(),
+            Genre::Comedy => "Comedy".to_string(),
+            Genre::Romance => "Romance".to_string(),
+            Genre::Unknown => "".to_string(),
+        }
+    }
+}
