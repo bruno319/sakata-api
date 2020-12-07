@@ -11,7 +11,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::dto::BaseCardDto;
 use crate::model::{Class, Genre};
+use crate::SakataResult;
 use crate::schema::base_cards;
+use crate::error::SakataError;
+use crate::utils::http_res::not_found;
 
 mod dao;
 pub mod handlers;
@@ -27,25 +30,21 @@ pub struct BaseCard {
 }
 
 impl BaseCard {
-    pub async fn new(dto: BaseCardDto) -> Result<BaseCard, String> {
-        let base_card = BaseCard {
+    pub fn new(dto: BaseCardDto) -> BaseCard {
+        BaseCard {
             id: None,
             name: dto.name,
             overall_power: dto.overall_power as i8,
             class: dto.class,
             genre: dto.genre,
             mal_id: dto.mal_id,
-        };
-
-        Ok(base_card)
+        }
     }
 }
 
-pub async fn calc_overall_power(mal_id: u32, anime_mal_ids: Vec<u32>) -> Result<i8, String> {
+pub async fn calc_overall_power(mal_id: u32, anime_mal_ids: Vec<u32>) -> SakataResult<i8> {
     let jikan = Jikan::new();
-    let character = jikan.find_character(mal_id)
-        .await
-        .map_err(|e| format!("{:?}", e))?;
+    let character = jikan.find_character(mal_id).await?;
 
     let animes = if anime_mal_ids.is_empty() {
         find_animes_from_character(&jikan, &character).await
@@ -54,7 +53,9 @@ pub async fn calc_overall_power(mal_id: u32, anime_mal_ids: Vec<u32>) -> Result<
     };
 
     if animes.is_empty() {
-        return Err(format!("No animes were found for character {}", character.name));
+        return Err(SakataError::ResourceNotFound(
+            not_found(format!("No animes were found for character {}", character.name))
+        ));
     }
 
     let (tv_series, movies): (Vec<Anime>, Vec<Anime>) = animes.into_iter()
@@ -148,7 +149,7 @@ fn calc_overall_score(animes: &Vec<Anime>) -> f32 {
     (mean_score - 5.0) / 0.11
 }
 
-pub fn common_card(conn: &MysqlConnection) -> Result<BaseCard, String> {
+pub fn common_card(conn: &MysqlConnection) -> SakataResult<BaseCard> {
     let rand = thread_rng().gen_range(0, 100);
     let (min_overall, max_overall) = if rand < 4 {
         (90, 99)
@@ -158,15 +159,11 @@ pub fn common_card(conn: &MysqlConnection) -> Result<BaseCard, String> {
         (0, 79)
     };
 
-    let range_cards = dao::list_by_overall_between((min_overall, max_overall), conn)
-        .map_err(|e| e.to_string())?
+    let range_cards = dao::list_by_overall_between((min_overall, max_overall), conn)?
         .into_iter()
         .filter_map(|c| c)
         .collect::<Vec<i32>>();
 
-    let card_id = range_cards.choose(&mut thread_rng())
-        .ok_or("No card returned from database")?;
-
+    let card_id = range_cards.choose(&mut thread_rng()).unwrap();
     dao::find_by_id(conn, *card_id)
-        .map_err(|e| e.to_string())
 }

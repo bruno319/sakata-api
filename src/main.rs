@@ -17,6 +17,9 @@ mod base_card;
 mod player;
 mod player_card;
 mod utils;
+mod error;
+
+type SakataResult<T> = Result<T, error::SakataError>;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

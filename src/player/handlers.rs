@@ -15,12 +15,9 @@ pub async fn get_player_by_id(
     pool: web::Data<MysqlPool>,
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
-    let player_id: i32 = extract_path_param("id", &req)?;
-
-    match dao::find_by_id(&mysql_pool, player_id) {
-        Ok(p) => Ok(http_res::ok(p)),
-        Err(e) => Err(http_res::internal_server_error(&e.to_string())),
-    }
+    let player_id = extract_path_param("id", &req)?;
+    let player = dao::find_by_id(&mysql_pool, player_id)?;
+    Ok(http_res::ok(player))
 }
 
 #[post("/players")]
@@ -30,11 +27,8 @@ pub async fn create_player(
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
     let player = Player::new(player_dto.0);
-
-    match dao::save(&mysql_pool, &player) {
-        Ok(p) => Ok(http_res::ok(p)),
-        Err(e) => Err(http_res::internal_server_error(&e.to_string())),
-    }
+    let player = dao::save(&mysql_pool, &player)?;
+    Ok(http_res::ok(player))
 }
 
 #[get("/players/{discord_id}/common-card")]
@@ -43,16 +37,12 @@ pub async fn buy_common_card(
     pool: web::Data<MysqlPool>,
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
-    let player_id: i64 = extract_path_param("discord_id", &req)?;
+    let player_id = extract_path_param("discord_id", &req)?;
 
-    let mut player = dao::find_by_discord_id(&mysql_pool, player_id)
-        .map_err(|e| http_res::internal_server_error(&e.to_string()))?;
+    let mut player = dao::find_by_discord_id(&mysql_pool, player_id)?;
 
-    let base_card = player.buy_common_card(&mysql_pool)
-        .map_err(|e| http_res::internal_server_error(&e))?;
+    let base_card = player.buy_common_card(&mysql_pool)?;
 
-    let player_card = player_card::add_to_collection(&player, &base_card, &mysql_pool)
-        .map_err(|e| http_res::internal_server_error(&e.to_string()))?;
-
+    let player_card = player_card::add_to_collection(&player, &base_card, &mysql_pool)?;
     Ok(HttpResponse::Ok().json(PlayerCardResponse::new(&player_card, &base_card)))
 }

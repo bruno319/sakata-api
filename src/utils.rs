@@ -4,14 +4,18 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use serde_json::Value;
 
 use crate::dbconfig::{MysqlPool, MySqlPooledConnection};
+use crate::error::SakataError;
+use crate::SakataResult;
+use http_res::server_error;
 
-pub fn mysql_pool_handler(pool: web::Data<MysqlPool>) -> Result<MySqlPooledConnection, HttpResponse> {
-    pool.get()
-        .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+pub fn mysql_pool_handler(pool: web::Data<MysqlPool>) -> SakataResult<MySqlPooledConnection> {
+    let mysql_pool = pool.get()
+        .map_err(|e| SakataError::DatabaseAccess(server_error(e)))?;
+    Ok(mysql_pool)
 }
 
-pub fn error_msg(message: &str) -> Value {
-    serde_json::json!({"errorMessage": message})
+pub fn error_msg<T: ToString>(message: T) -> Value {
+    serde_json::json!({"error_message": message.to_string()})
 }
 
 pub fn extract_path_param<T: FromStr>(param: &str, req: &HttpRequest) -> Result<T, HttpResponse> {
@@ -32,7 +36,15 @@ pub mod http_res {
         HttpResponse::Ok().json(json)
     }
 
-    pub fn internal_server_error(msg: &str) -> HttpResponse {
+    pub fn server_error<T: ToString>(msg: T) -> HttpResponse {
         HttpResponse::InternalServerError().json(error_msg(msg))
+    }
+
+    pub fn not_found<T: ToString>(msg: T) -> HttpResponse {
+        HttpResponse::NotFound().json(error_msg(msg))
+    }
+
+    pub fn forbidden<T: ToString>(msg: T) -> HttpResponse {
+        HttpResponse::Forbidden().json(error_msg(msg))
     }
 }

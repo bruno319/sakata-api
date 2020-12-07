@@ -1,10 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-use crate::base_card;
+use crate::{base_card, SakataResult};
 use crate::base_card::BaseCard;
 use crate::dbconfig::MySqlPooledConnection;
 use crate::dto::PlayerDto;
 use crate::schema::players;
+use crate::error::SakataError;
+use crate::utils::http_res::forbidden;
 
 mod dao;
 pub mod handlers;
@@ -30,14 +32,13 @@ impl Player {
         }
     }
 
-    pub fn buy_common_card(&mut self, conn: &MySqlPooledConnection) -> Result<BaseCard, String> {
+    pub fn buy_common_card(&mut self, conn: &MySqlPooledConnection) -> SakataResult<BaseCard> {
         if self.coins < 50 {
-            return Err("Insufficient Coins".to_string());
+            return Err(SakataError::NotEnoughResource(forbidden("Insufficient Coins")));
         }
 
         self.coins -= 50;
-        dao::update_coins(&self, conn)
-            .map_err(|e| e.to_string())?;
+        dao::update_coins(&self, conn)?;
 
         base_card::common_card(&conn)
     }

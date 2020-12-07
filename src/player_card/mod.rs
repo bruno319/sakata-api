@@ -8,6 +8,7 @@ use crate::base_card::BaseCard;
 use crate::model::{Rarity, Class, Genre};
 use crate::player::Player;
 use crate::schema::player_cards;
+use crate::SakataResult;
 
 mod dao;
 
@@ -48,7 +49,7 @@ fn generate_rarity() -> Rarity {
     }
 }
 
-pub fn add_to_collection(player: &Player, base_card: &BaseCard, conn: &MysqlConnection) -> Result<PlayerCard, String> {
+pub fn add_to_collection(player: &Player, base_card: &BaseCard, conn: &MysqlConnection) -> SakataResult<PlayerCard> {
     let player_cards = dao::find_by(player, base_card, conn);
     let rarity = generate_rarity();
 
@@ -56,8 +57,7 @@ pub fn add_to_collection(player: &Player, base_card: &BaseCard, conn: &MysqlConn
         for mut pc in p_cards {
             if pc.rarity == rarity {
                 pc.quantity += 1;
-                dao::update_quantity(&pc, conn)
-                    .map_err(|e| e.to_string())?;
+                dao::update_quantity(&pc, conn)?;
                 return Ok(pc);
             }
         }
@@ -65,7 +65,6 @@ pub fn add_to_collection(player: &Player, base_card: &BaseCard, conn: &MysqlConn
 
     dao::save(&PlayerCard::new(player, base_card, rarity), conn)
         .map(|pc| *pc)
-        .map_err(|e| e.to_string())
 }
 
 #[derive(Serialize, Deserialize, Debug)]

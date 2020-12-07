@@ -10,10 +10,8 @@ use super::dao;
 #[get("/basecards")]
 pub async fn get_cards(pool: web::Data<MysqlPool>) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
-    match dao::list(&mysql_pool) {
-        Ok(bc) => Ok(http_res::ok(bc)),
-        Err(e) => Err(http_res::internal_server_error(&e.to_string())),
-    }
+    let base_cards = dao::list(&mysql_pool)?;
+    Ok(http_res::ok(base_cards))
 }
 
 #[get("/basecards/{id}")]
@@ -22,12 +20,9 @@ pub async fn get_card_by_id(
     pool: web::Data<MysqlPool>,
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
-    let base_card_id: i32 = extract_path_param("id", &req)?;
-
-    match dao::find_by_id(&mysql_pool, base_card_id) {
-        Ok(bc) => Ok(http_res::ok(bc)),
-        Err(e) => Err(http_res::internal_server_error(&e.to_string())),
-    }
+    let base_card_id = extract_path_param("id", &req)?;
+    let base_card = dao::find_by_id(&mysql_pool, base_card_id)?;
+    Ok(http_res::ok(base_card))
 }
 
 #[post("/basecards")]
@@ -36,14 +31,9 @@ pub async fn create_base_card(
     pool: web::Data<MysqlPool>,
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
-    let base_card = BaseCard::new(base_card_dto.0)
-        .await
-        .map_err(|e| http_res::internal_server_error(&e.to_string()))?;
-
-    match dao::save(&mysql_pool, &base_card) {
-        Ok(bc) => Ok(http_res::ok(bc)),
-        Err(e) => Err(http_res::internal_server_error(&e.to_string())),
-    }
+    let base_card = BaseCard::new(base_card_dto.0);
+    let base_card = dao::save(&mysql_pool, &base_card)?;
+    Ok(http_res::ok(base_card))
 }
 
 #[post("/basecards/overall-power/{mal_id}")]
@@ -51,11 +41,8 @@ pub async fn generate_overall_power(
     req: HttpRequest,
     animes: web::Json<AnimeIdsDto>,
 ) -> Result<HttpResponse, HttpResponse> {
-    let mal_id: u32 = extract_path_param("mal_id", &req)?;
+    let mal_id = extract_path_param("mal_id", &req)?;
 
-    let overall_power = calc_overall_power(mal_id, animes.0.anime_mal_ids)
-        .await
-        .map_err(|e| http_res::internal_server_error(&e.to_string()))?;
-
-    Ok(http_res::ok(serde_json::json!({"overallPower": overall_power})))
+    let overall_power = calc_overall_power(mal_id, animes.0.anime_mal_ids).await?;
+    Ok(http_res::ok(serde_json::json!({"overall_power": overall_power})))
 }
