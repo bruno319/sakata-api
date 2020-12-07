@@ -43,3 +43,13 @@ pub fn update_coins<'a, 'b>(player: &'a Player, conn: &'b MysqlConnection) -> Sa
 
     Ok(player)
 }
+
+pub fn update_stardust<'a, 'b>(player: &'a Player, conn: &'b MysqlConnection) -> SakataResult<&'a Player> {
+    use crate::schema::players::columns::stardust;
+
+    diesel::update(player)
+        .set(stardust.eq(player.stardust))
+        .execute(conn)?;
+
+    Ok(player)
+}

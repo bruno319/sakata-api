@@ -38,11 +38,23 @@ pub async fn buy_common_card(
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
     let player_id = extract_path_param("discord_id", &req)?;
-
     let mut player = dao::find_by_discord_id(&mysql_pool, player_id)?;
 
     let base_card = player.buy_common_card(&mysql_pool)?;
-
     let player_card = player_card::add_to_collection(&player, &base_card, &mysql_pool)?;
-    Ok(HttpResponse::Ok().json(PlayerCardResponse::new(&player_card, &base_card)))
+    Ok(http_res::ok(PlayerCardResponse::new(&player_card, &base_card)))
+}
+
+#[get("/players/{discord_id}/star-card")]
+pub async fn buy_star_card(
+    req: HttpRequest,
+    pool: web::Data<MysqlPool>,
+) -> Result<HttpResponse, HttpResponse> {
+    let mysql_pool = mysql_pool_handler(pool)?;
+    let player_id = extract_path_param("discord_id", &req)?;
+    let mut player = dao::find_by_discord_id(&mysql_pool, player_id)?;
+
+    let base_card = player.buy_star_card(&mysql_pool)?;
+    let player_card = player_card::add_to_collection(&player, &base_card, &mysql_pool)?;
+    Ok(http_res::ok(PlayerCardResponse::new(&player_card, &base_card)))
 }

@@ -28,7 +28,7 @@ impl Player {
             discord_id: dto.discord_id,
             nickname: dto.nickname,
             coins: 300,
-            stardust: 0,
+            stardust: 50,
         }
     }
 
@@ -41,5 +41,16 @@ impl Player {
         dao::update_coins(&self, conn)?;
 
         base_card::common_card(&conn)
+    }
+
+    pub fn buy_star_card(&mut self, conn: &MySqlPooledConnection) -> SakataResult<BaseCard> {
+        if self.stardust < 50 {
+            return Err(SakataError::NotEnoughResource(forbidden("Insufficient Stardust")));
+        }
+
+        self.stardust -= 50;
+        dao::update_stardust(&self, conn)?;
+
+        base_card::star_card(&conn)
     }
 }

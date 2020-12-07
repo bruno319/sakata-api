@@ -167,3 +167,22 @@ pub fn common_card(conn: &MysqlConnection) -> SakataResult<BaseCard> {
     let card_id = range_cards.choose(&mut thread_rng()).unwrap();
     dao::find_by_id(conn, *card_id)
 }
+
+pub fn star_card(conn: &MysqlConnection) -> SakataResult<BaseCard> {
+    let rand = thread_rng().gen_range(0, 100);
+    let (min_overall, max_overall) = if rand < 20 {
+        (95, 99)
+    } else if rand < 60 {
+        (90, 94)
+    } else {
+        (85, 89)
+    };
+
+    let range_cards = dao::list_by_overall_between((min_overall, max_overall), conn)?
+        .into_iter()
+        .filter_map(|c| c)
+        .collect::<Vec<i32>>();
+
+    let card_id = range_cards.choose(&mut thread_rng()).unwrap();
+    dao::find_by_id(conn, *card_id)
+}

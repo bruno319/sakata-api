@@ -38,6 +38,7 @@ async fn main() -> std::io::Result<()> {
             .service(player::handlers::create_player)
             .service(player::handlers::get_player_by_id)
             .service(player::handlers::buy_common_card)
+            .service(player::handlers::buy_star_card)
     })
         .bind("127.0.0.1:8080")
         .unwrap()
