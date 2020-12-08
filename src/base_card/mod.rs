@@ -10,10 +10,10 @@ use rand::prelude::SliceRandom;
 use serde::{Deserialize, Serialize};
 
 use crate::dto::BaseCardDto;
+use crate::error::SakataError;
 use crate::model::{Class, Genre};
 use crate::SakataResult;
 use crate::schema::base_cards;
-use crate::error::SakataError;
 use crate::utils::http_res::not_found;
 
 mod dao;

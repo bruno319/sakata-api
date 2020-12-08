@@ -2,7 +2,7 @@
 extern crate diesel;
 
 use actix_cors::Cors;
-use actix_web::{App, HttpServer, web};
+use actix_web::{App, HttpServer};
 use actix_web::middleware::Logger;
 
 use crate::dbconfig::connect;

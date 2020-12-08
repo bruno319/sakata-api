@@ -5,10 +5,10 @@ use rand::{Rng, thread_rng};
 use serde::{Deserialize, Serialize};
 
 use crate::base_card::BaseCard;
-use crate::model::{Rarity, Class, Genre};
+use crate::model::{Class, Genre, Rarity};
 use crate::player::Player;
-use crate::schema::player_cards;
 use crate::SakataResult;
+use crate::schema::player_cards;
 
 mod dao;
 

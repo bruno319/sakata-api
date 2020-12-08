@@ -28,7 +28,7 @@ pub async fn create_player(
     let mysql_pool = mysql_pool_handler(pool)?;
     let player = Player::new(player_dto.0);
     let player = dao::save(&mysql_pool, &player)?;
-    Ok(http_res::ok(player))
+    Ok(http_res::created(player))
 }
 
 #[get("/players/{discord_id}/common-card")]

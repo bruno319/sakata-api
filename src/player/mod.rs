@@ -4,8 +4,8 @@ use crate::{base_card, SakataResult};
 use crate::base_card::BaseCard;
 use crate::dbconfig::MySqlPooledConnection;
 use crate::dto::PlayerDto;
-use crate::schema::players;
 use crate::error::SakataError;
+use crate::schema::players;
 use crate::utils::http_res::forbidden;
 
 mod dao;

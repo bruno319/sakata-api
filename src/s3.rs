@@ -1,5 +1,10 @@
+use log::*;
 use rusoto_core::Region;
-use rusoto_s3::{S3, DeleteObjectRequest, PutObjectRequest, S3Client};
+use rusoto_s3::{DeleteObjectRequest, PutObjectRequest, S3, S3Client};
+
+use crate::error::SakataError;
+use crate::SakataResult;
+use crate::utils::http_res::server_error;
 
 pub struct AwsS3Client {
     #[allow(dead_code)]
@@ -28,20 +33,28 @@ impl AwsS3Client {
         )
     }
 
-    pub async fn put_object(&self, content: Vec<u8>, key: String) -> String {
+    pub async fn put_object(&self, content: Vec<u8>, key: String) -> SakataResult<String> {
         let put_request = PutObjectRequest {
             bucket: self.bucket_name.to_owned(),
             key: key.clone(),
             body: Some(content.into()),
             ..Default::default()
         };
-        let _res = self
+        let res = self
             .s3
             .put_object(put_request)
-            .await
-            .expect("Failed to put test object");
+            .await;
 
-        self.url(&key)
+        match res {
+            Ok(_res) => {
+                info!("{} uploaded to S3", key);
+                Ok(self.url(&key))
+            }
+            Err(e) => {
+                error!("S3 Error: {}", e);
+                Err(SakataError::ServerErr(server_error("Failed to upload file to S3")))
+            }
+        }
     }
 
     #[allow(dead_code)]

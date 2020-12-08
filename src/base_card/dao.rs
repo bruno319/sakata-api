@@ -1,7 +1,8 @@
 use diesel::{ExpressionMethods, MysqlConnection, QueryDsl, RunQueryDsl};
 
-use super::BaseCard;
 use crate::SakataResult;
+
+use super::BaseCard;
 
 pub fn list(conn: &MysqlConnection) -> SakataResult<Vec<BaseCard>> {
     use crate::schema::base_cards::dsl::*;

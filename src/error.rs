@@ -11,7 +11,7 @@ pub enum SakataError {
     DatabaseAccess(HttpResponse),
     ResourceNotFound(HttpResponse),
     NotEnoughResource(HttpResponse),
-    InternalServerError(HttpResponse),
+    ServerErr(HttpResponse),
 }
 
 impl From<SakataError> for HttpResponse {
@@ -20,7 +20,7 @@ impl From<SakataError> for HttpResponse {
             SakataError::DatabaseAccess(http_res) => http_res,
             SakataError::ResourceNotFound(http_res) => http_res,
             SakataError::NotEnoughResource(http_res) => http_res,
-            SakataError::InternalServerError(http_res) => http_res,
+            SakataError::ServerErr(http_res) => http_res,
         }
     }
 }
@@ -36,6 +36,6 @@ impl From<DieselError> for SakataError {
 
 impl From<Box<dyn Error + Send+ Sync>> for SakataError {
     fn from(err: Box<dyn Error + Send+ Sync>) -> Self {
-        SakataError::InternalServerError(server_error(err))
+        SakataError::ServerErr(server_error(err))
     }
 }
