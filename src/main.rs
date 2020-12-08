@@ -2,7 +2,7 @@
 extern crate diesel;
 
 use actix_cors::Cors;
-use actix_web::{App, HttpServer};
+use actix_web::{App, HttpServer, web};
 use actix_web::middleware::Logger;
 
 use crate::dbconfig::connect;
@@ -18,6 +18,7 @@ mod player;
 mod player_card;
 mod utils;
 mod error;
+mod s3;
 
 type SakataResult<T> = Result<T, error::SakataError>;
 
@@ -31,6 +32,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .wrap(Cors::permissive())
             .data(connect())
+            .service(base_card::handlers::save_image_card)
             .service(base_card::handlers::get_cards)
             .service(base_card::handlers::create_base_card)
             .service(base_card::handlers::generate_overall_power)
