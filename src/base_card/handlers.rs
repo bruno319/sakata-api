@@ -1,5 +1,3 @@
-use std::borrow::BorrowMut;
-
 use actix_multipart::Multipart;
 use actix_web::{get, HttpRequest, HttpResponse, post, Result, web};
 use serde_json::json;
@@ -51,8 +49,8 @@ pub async fn generate_overall_power(
 }
 
 #[post("/basecards/image")]
-pub async fn save_image_card(mut payload: Multipart) -> Result<HttpResponse, HttpResponse> {
-    let bytes = image_bytes(payload.borrow_mut()).await?;
+pub async fn save_image_card(payload: Multipart) -> Result<HttpResponse, HttpResponse> {
+    let bytes = image_bytes(payload).await?;
     let url = AwsS3Client::new().put_object(bytes.0, bytes.1).await?;
     Ok(http_res::created(json!({"url": url})))
 }

@@ -14,7 +14,6 @@ use crate::error::SakataError;
 use crate::model::{Class, Genre};
 use crate::SakataResult;
 use crate::schema::base_cards;
-use crate::utils::http_res::not_found;
 
 mod dao;
 pub mod handlers;
@@ -53,9 +52,7 @@ pub async fn calc_overall_power(mal_id: u32, anime_mal_ids: Vec<u32>) -> SakataR
     };
 
     if animes.is_empty() {
-        return Err(SakataError::ResourceNotFound(
-            not_found(format!("No animes were found for character {}", character.name))
-        ));
+        return Err(SakataError::ResourceNotFound(format!("No animes were found for character {}", character.name)));
     }
 
     let (tv_series, movies): (Vec<Anime>, Vec<Anime>) = animes.into_iter()

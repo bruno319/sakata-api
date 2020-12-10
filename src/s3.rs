@@ -4,10 +4,8 @@ use rusoto_s3::{DeleteObjectRequest, PutObjectRequest, S3, S3Client};
 
 use crate::error::SakataError;
 use crate::SakataResult;
-use crate::utils::http_res::server_error;
 
 pub struct AwsS3Client {
-    #[allow(dead_code)]
     region: Region,
     s3: S3Client,
     bucket_name: String,
@@ -26,10 +24,7 @@ impl AwsS3Client {
 
     pub fn url(&self, key: &str) -> String {
         format!(
-            "https://{}.s3.{}.amazonaws.com/{}",
-            std::env::var("AWS_S3_BUCKET_NAME").unwrap(),
-            std::env::var("AWS_REGION").unwrap(),
-            key
+            "https://{}.s3.{}.amazonaws.com/{}", self.bucket_name, self.region.name(), key
         )
     }
 
@@ -52,7 +47,7 @@ impl AwsS3Client {
             }
             Err(e) => {
                 error!("S3 Error: {}", e);
-                Err(SakataError::ServerErr(server_error("Failed to upload file to S3")))
+                Err(SakataError::ServerErr("Failed to upload file to S3".to_string()))
             }
         }
     }

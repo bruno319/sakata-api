@@ -6,7 +6,6 @@ use crate::dbconfig::MySqlPooledConnection;
 use crate::dto::PlayerDto;
 use crate::error::SakataError;
 use crate::schema::players;
-use crate::utils::http_res::forbidden;
 
 mod dao;
 pub mod handlers;
@@ -34,7 +33,7 @@ impl Player {
 
     pub fn buy_common_card(&mut self, conn: &MySqlPooledConnection) -> SakataResult<BaseCard> {
         if self.coins < 50 {
-            return Err(SakataError::NotEnoughResource(forbidden("Insufficient Coins")));
+            return Err(SakataError::NotEnoughResource("Insufficient Coins".to_string()));
         }
 
         self.coins -= 50;
@@ -45,7 +44,7 @@ impl Player {
 
     pub fn buy_star_card(&mut self, conn: &MySqlPooledConnection) -> SakataResult<BaseCard> {
         if self.stardust < 50 {
-            return Err(SakataError::NotEnoughResource(forbidden("Insufficient Stardust")));
+            return Err(SakataError::NotEnoughResource("Insufficient Stardust".to_string()));
         }
 
         self.stardust -= 50;
