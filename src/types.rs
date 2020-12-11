@@ -28,7 +28,7 @@ pub enum Class {
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, AsExpression, FromSqlRow, Clone, Copy)]
 #[repr(i8)]
 #[sql_type = "TinyInt"]
-pub enum Genre {
+pub enum Domain {
     Unknown = -1,
     Action = 1,
     Adventure = 2,
@@ -52,7 +52,7 @@ pub enum Rarity {
 }
 
 impl_tinyint_sql_op!(Class);
-impl_tinyint_sql_op!(Genre);
+impl_tinyint_sql_op!(Domain);
 impl_tinyint_sql_op!(Rarity);
 
 impl Default for Class {
@@ -61,9 +61,9 @@ impl Default for Class {
     }
 }
 
-impl Default for Genre {
+impl Default for Domain {
     fn default() -> Self {
-        Genre::Unknown
+        Domain::Unknown
     }
 }
 
@@ -105,18 +105,18 @@ impl ToString for Class {
     }
 }
 
-impl ToString for Genre {
+impl ToString for Domain {
     fn to_string(&self) -> String {
         match self {
-            Genre::Action => "Action".to_string(),
-            Genre::Adventure => "Adventure".to_string(),
-            Genre::SciFi => "Sci-Fi".to_string(),
-            Genre::Sports => "Sports".to_string(),
-            Genre::Mystery => "Mystery".to_string(),
-            Genre::SliceOfLife => "Slice of Life".to_string(),
-            Genre::Comedy => "Comedy".to_string(),
-            Genre::Romance => "Romance".to_string(),
-            Genre::Unknown => "".to_string(),
+            Domain::Action => "Action".to_string(),
+            Domain::Adventure => "Adventure".to_string(),
+            Domain::SciFi => "Sci-Fi".to_string(),
+            Domain::Sports => "Sports".to_string(),
+            Domain::Mystery => "Mystery".to_string(),
+            Domain::SliceOfLife => "Slice of Life".to_string(),
+            Domain::Comedy => "Comedy".to_string(),
+            Domain::Romance => "Romance".to_string(),
+            Domain::Unknown => "".to_string(),
         }
     }
 }

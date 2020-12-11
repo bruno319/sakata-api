@@ -4,7 +4,7 @@ table! {
         name -> Varchar,
         overall_power -> Tinyint,
         class -> Tinyint,
-        genre -> Tinyint,
+        domain -> Tinyint,
         mal_id -> Integer,
     }
 }
@@ -22,10 +22,10 @@ table! {
 table! {
     players (id) {
         id -> Nullable<Integer>,
+        discord_id -> Bigint,
         nickname -> Varchar,
         coins -> Smallint,
         stardust -> Smallint,
-        discord_id -> Bigint,
     }
 }
 

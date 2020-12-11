@@ -3,7 +3,7 @@ use rand::{Rng, thread_rng};
 use serde::{Deserialize, Serialize};
 
 use crate::base_card::BaseCard;
-use crate::model::{Class, Genre, Rarity};
+use crate::types::{Class, Domain, Rarity};
 use crate::player::Player;
 use crate::SakataResult;
 use crate::schema::player_cards;
@@ -71,7 +71,7 @@ pub struct PlayerCardResponse {
     pub name: String,
     pub rarity: Rarity,
     pub class: Class,
-    pub genre: Genre,
+    pub domain: Domain,
     pub image: String,
     pub quantity: i8,
 }
@@ -85,7 +85,7 @@ impl PlayerCardResponse {
             name: base_card.name.clone(),
             rarity: player_card.rarity,
             class: base_card.class,
-            genre: base_card.genre,
+            domain: base_card.domain,
             image: image_name,
             quantity: player_card.quantity,
         }

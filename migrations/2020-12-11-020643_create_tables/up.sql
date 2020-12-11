@@ -1,16 +1,15 @@
-DROP TABLE IF EXISTS `base_cards`;
-
 CREATE TABLE `base_cards` (
     `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
     `name` VARCHAR(40) NOT NULL,
     `overall_power` TINYINT NOT NULL,
     `class` TINYINT NOT NULL,
-    `genre` TINYINT NOT NULL,
+    `domain` TINYINT NOT NULL,
     `mal_id` INT NOT NULL
 );
 
 CREATE TABLE `players` (
     `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
+    `discord_id` BIGINT NOT NULL UNIQUE,
     `nickname` VARCHAR(40) NOT NULL,
     `coins` SMALLINT NOT NULL,
     `stardust` SMALLINT NOT NULL

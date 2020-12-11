@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::dto::BaseCardDto;
 use crate::error::SakataError;
-use crate::model::{Class, Genre};
+use crate::types::{Class, Domain};
 use crate::SakataResult;
 use crate::schema::base_cards;
 
@@ -24,7 +24,7 @@ pub struct BaseCard {
     pub name: String,
     pub overall_power: i8,
     pub class: Class,
-    pub genre: Genre,
+    pub domain: Domain,
     pub mal_id: i32,
 }
 
@@ -35,7 +35,7 @@ impl BaseCard {
             name: dto.name,
             overall_power: dto.overall_power as i8,
             class: dto.class,
-            genre: dto.genre,
+            domain: dto.domain,
             mal_id: dto.mal_id,
         }
     }

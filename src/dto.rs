@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-use crate::model::{Class, Genre};
+use crate::types::{Class, Domain};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BaseCardDto {
     pub name: String,
     pub class: Class,
-    pub genre: Genre,
+    pub domain: Domain,
     pub mal_id: i32,
     pub overall_power: u8,
 }
