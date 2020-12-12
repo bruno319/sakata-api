@@ -1,7 +1,7 @@
 use actix_web::{get, HttpRequest, HttpResponse, post, web};
 
 use crate::dbconfig::MysqlPool;
-use crate::dto::PlayerDto;
+use crate::dto::{PlayerDto, SwapPartyCards};
 use crate::player::Player;
 use crate::player_card;
 use crate::player_card::PlayerCardResponse;
@@ -57,4 +57,17 @@ pub async fn buy_star_card(
     let base_card = player.buy_star_card(&mysql_pool)?;
     let player_card = player_card::add_to_collection(&player, &base_card, &mysql_pool)?;
     Ok(http_res::ok(PlayerCardResponse::new(&player_card, &base_card)))
+}
+
+#[post("/players/{discord_id}/party/swap")]
+pub async fn swap_party_cards(
+    req: HttpRequest,
+    swap: web::Json<SwapPartyCards>,
+    pool: web::Data<MysqlPool>,
+) -> Result<HttpResponse, HttpResponse> {
+    let mysql_pool = mysql_pool_handler(pool)?;
+    let player_id = extract_path_param("discord_id", &req)?;
+    let mut player = dao::find_by_discord_id(&mysql_pool, player_id)?;
+
+    Ok(HttpResponse::NoContent().finish())
 }

@@ -21,3 +21,9 @@ pub struct PlayerDto {
 pub struct AnimeIdsDto {
     pub anime_mal_ids: Vec<u32>,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SwapPartyCards {
+    pub card_in: u32,
+    pub card_out: u32,
+}

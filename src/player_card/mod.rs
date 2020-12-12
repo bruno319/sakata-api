@@ -14,11 +14,11 @@ mod dao;
 #[belongs_to(Player, foreign_key = "id")]
 #[belongs_to(BaseCard, foreign_key = "id")]
 pub struct PlayerCard {
-    id: Option<i32>,
-    base_card_id: i32,
-    player_id: i32,
+    id: Option<u32>,
+    base_card_id: u32,
+    player_id: u32,
     rarity: Rarity,
-    quantity: i8,
+    quantity: u8,
 }
 
 impl PlayerCard {
@@ -67,13 +67,13 @@ pub fn add_to_collection(player: &Player, base_card: &BaseCard, conn: &MysqlConn
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PlayerCardResponse {
-    pub card_id: i32,
+    pub card_id: u32,
     pub name: String,
     pub rarity: Rarity,
     pub class: Class,
     pub domain: Domain,
     pub image: String,
-    pub quantity: i8,
+    pub quantity: u8,
 }
 
 impl PlayerCardResponse {

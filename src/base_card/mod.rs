@@ -20,9 +20,9 @@ pub mod handlers;
 
 #[derive(Queryable, Identifiable, Insertable, Serialize, Deserialize, Debug)]
 pub struct BaseCard {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub name: String,
-    pub overall_power: i8,
+    pub overall_power: u8,
     pub class: Class,
     pub domain: Domain,
     pub mal_id: i32,
@@ -33,7 +33,7 @@ impl BaseCard {
         BaseCard {
             id: None,
             name: dto.name,
-            overall_power: dto.overall_power as i8,
+            overall_power: dto.overall_power,
             class: dto.class,
             domain: dto.domain,
             mal_id: dto.mal_id,
@@ -159,7 +159,7 @@ pub fn common_card(conn: &MysqlConnection) -> SakataResult<BaseCard> {
     let range_cards = dao::list_by_overall_between((min_overall, max_overall), conn)?
         .into_iter()
         .filter_map(|c| c)
-        .collect::<Vec<i32>>();
+        .collect::<Vec<u32>>();
 
     let card_id = range_cards.choose(&mut thread_rng()).unwrap();
     dao::find_by_id(conn, *card_id)
@@ -178,7 +178,7 @@ pub fn star_card(conn: &MysqlConnection) -> SakataResult<BaseCard> {
     let range_cards = dao::list_by_overall_between((min_overall, max_overall), conn)?
         .into_iter()
         .filter_map(|c| c)
-        .collect::<Vec<i32>>();
+        .collect::<Vec<u32>>();
 
     let card_id = range_cards.choose(&mut thread_rng()).unwrap();
     dao::find_by_id(conn, *card_id)

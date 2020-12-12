@@ -19,6 +19,7 @@ mod player_card;
 mod utils;
 mod error;
 mod s3;
+mod party;
 
 type SakataResult<T> = Result<T, error::SakataError>;
 

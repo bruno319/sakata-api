@@ -13,7 +13,7 @@ pub fn save<'a, 'b>(conn: &'b MysqlConnection, player: &'a Player) -> SakataResu
     Ok(player)
 }
 
-pub fn find_by_id(conn: &MysqlConnection, id: i32) -> SakataResult<Player> {
+pub fn find_by_id(conn: &MysqlConnection, id: u32) -> SakataResult<Player> {
     use crate::schema::players;
 
     let player = players::table

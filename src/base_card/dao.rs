@@ -14,17 +14,17 @@ pub fn list(conn: &MysqlConnection) -> SakataResult<Vec<BaseCard>> {
     Ok(cards)
 }
 
-pub fn list_by_overall_between((min, max): (i32, i32), conn: &MysqlConnection) -> SakataResult<Vec<Option<i32>>> {
+pub fn list_by_overall_between((min, max): (u8, u8), conn: &MysqlConnection) -> SakataResult<Vec<Option<u32>>> {
     use crate::schema::base_cards::dsl::*;
 
     let cards = base_cards.select(id)
-        .filter(overall_power.between((min - 1) as i8, (max + 1) as i8))
+        .filter(overall_power.between(min - 1, max + 1))
         .load(conn)?;
 
     Ok(cards)
 }
 
-pub fn find_by_id(conn: &MysqlConnection, id: i32) -> SakataResult<BaseCard> {
+pub fn find_by_id(conn: &MysqlConnection, id: u32) -> SakataResult<BaseCard> {
     use crate::schema::base_cards;
 
     let card = base_cards::table

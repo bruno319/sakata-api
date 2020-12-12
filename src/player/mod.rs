@@ -13,7 +13,7 @@ pub mod handlers;
 #[derive(Queryable, Identifiable, Insertable, Serialize, Deserialize, Debug)]
 #[table_name = "players"]
 pub struct Player {
-    pub id: Option<i32>,
+    pub id: Option<u32>,
     pub discord_id: i64,
     pub nickname: String,
     pub coins: i16,
