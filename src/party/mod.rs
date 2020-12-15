@@ -10,7 +10,7 @@ use crate::schema::party;
 
 pub mod dao;
 
-#[derive(Queryable, Identifiable, Insertable, Associations, Serialize, Deserialize, Clone, Debug, Default)]
+#[derive(Queryable, Identifiable, Insertable, Associations, AsChangeset, Serialize, Deserialize, Clone, Debug, Default)]
 #[belongs_to(Player, foreign_key = "id")]
 #[table_name = "party"]
 pub struct PartyEntity {

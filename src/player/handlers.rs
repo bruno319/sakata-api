@@ -101,7 +101,7 @@ pub async fn swap_party_cards(
     let mut party = party::dao::find_by_discord_id(&mysql_pool, player_id)?;
 
     party.swap(card_in, card_out, player, &mysql_pool)?;
-    party::dao::save(&mysql_pool, &party)?;
+    party::dao::update(&mysql_pool, &party)?;
 
     Ok(HttpResponse::Ok().json(PartyResponse::new(party)))
 }

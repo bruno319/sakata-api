@@ -14,6 +14,16 @@ pub fn save<'a, 'b>(conn: &'b MySqlPooledConnection, party: &'a Party) -> Sakata
     Ok(party)
 }
 
+pub fn update<'a, 'b>(conn: &'b MySqlPooledConnection, party: &'a Party) -> SakataResult<&'a Party> {
+    use crate::schema::party;
+
+    diesel::update(party::table)
+        .set(PartyEntity::from(party))
+        .execute(conn)?;
+
+    Ok(party)
+}
+
 pub fn find_by_discord_id(conn: &MySqlPooledConnection, discord_id: i64) -> SakataResult<Party> {
     use crate::schema::party;
     use crate::schema::party::columns::id;

@@ -69,7 +69,7 @@ impl PlayerCardResponse {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PartyResponse {
-    pub id: u64,
+    pub id: i64,
     pub power: u16,
     pub cards: Vec<PlayerCardResponse>,
 }
@@ -82,7 +82,7 @@ impl PartyResponse {
             .collect();
 
         PartyResponse {
-            id: party.id as u64,
+            id: party.id,
             power: party.power,
             cards,
         }
