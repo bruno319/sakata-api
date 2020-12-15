@@ -11,19 +11,19 @@ table! {
 
 table! {
     party (id) {
-        id -> Unsigned<Integer>,
+        id -> Bigint,
         power -> Unsigned<Smallint>,
-        card_1 -> Unsigned<Integer>,
-        card_2 -> Unsigned<Integer>,
-        card_3 -> Unsigned<Integer>,
-        card_4 -> Unsigned<Integer>,
-        card_5 -> Unsigned<Integer>,
+        card_1 -> Varchar,
+        card_2 -> Varchar,
+        card_3 -> Varchar,
+        card_4 -> Varchar,
+        card_5 -> Varchar,
     }
 }
 
 table! {
     player_cards (id) {
-        id -> Nullable<Unsigned<Integer>>,
+        id -> Varchar,
         base_card_id -> Unsigned<Integer>,
         player_id -> Unsigned<Integer>,
         rarity -> Tinyint,
@@ -41,7 +41,6 @@ table! {
     }
 }
 
-joinable!(party -> players (id));
 joinable!(player_cards -> base_cards (base_card_id));
 joinable!(player_cards -> players (player_id));
 

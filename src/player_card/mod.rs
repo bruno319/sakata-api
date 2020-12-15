@@ -1,30 +1,32 @@
-use diesel::MysqlConnection;
 use rand::{Rng, thread_rng};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::base_card::BaseCard;
-use crate::types::{Class, Domain, Rarity};
+use crate::dbconfig::MySqlPooledConnection;
 use crate::player::Player;
 use crate::SakataResult;
 use crate::schema::player_cards;
+use crate::types::model::Rarity;
 
-mod dao;
+pub mod dao;
 
-#[derive(Queryable, Identifiable, Insertable, Associations, Serialize, Deserialize, Clone, Copy, Debug)]
+#[derive(Queryable, QueryableByName, Identifiable, Insertable, Associations, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
+#[table_name = "player_cards"]
 #[belongs_to(Player, foreign_key = "id")]
 #[belongs_to(BaseCard, foreign_key = "id")]
 pub struct PlayerCard {
-    id: Option<u32>,
-    base_card_id: u32,
-    player_id: u32,
-    rarity: Rarity,
-    quantity: u8,
+    pub id: String,
+    pub base_card_id: u32,
+    pub player_id: u32,
+    pub rarity: Rarity,
+    pub quantity: u8,
 }
 
 impl PlayerCard {
     pub fn new(player: &Player, base_card: &BaseCard, rarity: Rarity) -> PlayerCard {
         PlayerCard {
-            id: None,
+            id: Uuid::new_v4().to_string(),
             base_card_id: base_card.id.unwrap(),
             player_id: player.id.unwrap(),
             rarity,
@@ -47,7 +49,7 @@ fn generate_rarity() -> Rarity {
     }
 }
 
-pub fn add_to_collection(player: &Player, base_card: &BaseCard, conn: &MysqlConnection) -> SakataResult<PlayerCard> {
+pub fn add_to_collection(player: &Player, base_card: &BaseCard, conn: &MySqlPooledConnection) -> SakataResult<PlayerCard> {
     let player_cards = dao::find_by(player, base_card, conn);
     let rarity = generate_rarity();
 
@@ -61,33 +63,8 @@ pub fn add_to_collection(player: &Player, base_card: &BaseCard, conn: &MysqlConn
         }
     }
 
-    dao::save(&PlayerCard::new(player, base_card, rarity), conn)
-        .map(|pc| *pc)
-}
+    let player = PlayerCard::new(player, base_card, rarity);
+    dao::save(&player, conn)?;
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct PlayerCardResponse {
-    pub card_id: u32,
-    pub name: String,
-    pub rarity: Rarity,
-    pub class: Class,
-    pub domain: Domain,
-    pub image: String,
-    pub quantity: u8,
-}
-
-impl PlayerCardResponse {
-    pub fn new(player_card: &PlayerCard, base_card: &BaseCard) -> PlayerCardResponse {
-        let image_name = format!("sakata_{}_{}.jpeg", base_card.mal_id, player_card.rarity as i8);
-
-        PlayerCardResponse {
-            card_id: base_card.id.unwrap_or_default(),
-            name: base_card.name.clone(),
-            rarity: player_card.rarity,
-            class: base_card.class,
-            domain: base_card.domain,
-            image: image_name,
-            quantity: player_card.quantity,
-        }
-    }
+    Ok(player)
 }

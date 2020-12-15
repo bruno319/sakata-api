@@ -3,8 +3,8 @@ use actix_web::{get, HttpRequest, HttpResponse, post, Result, web};
 use serde_json::json;
 
 use crate::dbconfig::MysqlPool;
-use crate::dto::{AnimeIdsDto, BaseCardDto};
 use crate::s3::AwsS3Client;
+use crate::types::json_req::{AnimesJson, BaseCardJson};
 use crate::utils::{extract_path_param, http_res, image_bytes, mysql_pool_handler};
 
 use super::{BaseCard, calc_overall_power, dao};
@@ -29,7 +29,7 @@ pub async fn get_card_by_id(
 
 #[post("/basecards")]
 pub async fn create_base_card(
-    base_card_dto: web::Json<BaseCardDto>,
+    base_card_dto: web::Json<BaseCardJson>,
     pool: web::Data<MysqlPool>,
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
@@ -41,10 +41,10 @@ pub async fn create_base_card(
 #[post("/basecards/overall-power/{mal_id}")]
 pub async fn generate_overall_power(
     req: HttpRequest,
-    animes: web::Json<AnimeIdsDto>,
+    animes: web::Json<AnimesJson>,
 ) -> Result<HttpResponse, HttpResponse> {
     let mal_id = extract_path_param("mal_id", &req)?;
-    let overall_power = calc_overall_power(mal_id, animes.0.anime_mal_ids).await?;
+    let overall_power = calc_overall_power(mal_id, animes.0.animes).await?;
     Ok(http_res::ok(json!({"overall_power": overall_power})))
 }
 

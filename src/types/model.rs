@@ -40,7 +40,7 @@ pub enum Domain {
     Romance = 8,
 }
 
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, AsExpression, FromSqlRow, Clone, Copy)]
+#[derive(Serialize_repr, Deserialize_repr, PartialEq, Eq, PartialOrd, Ord, Debug, AsExpression, FromSqlRow, Clone, Copy)]
 #[repr(i8)]
 #[sql_type = "TinyInt"]
 pub enum Rarity {
@@ -54,6 +54,18 @@ pub enum Rarity {
 impl_tinyint_sql_op!(Class);
 impl_tinyint_sql_op!(Domain);
 impl_tinyint_sql_op!(Rarity);
+
+impl Rarity {
+    pub fn get_bonus(&self) -> u16 {
+        match self {
+            Rarity::Unknown => 0,
+            Rarity::Silver => 0,
+            Rarity::Gold => 1,
+            Rarity::Epic => 3,
+            Rarity::Legend => 5
+        }
+    }
+}
 
 impl Default for Class {
     fn default() -> Self {

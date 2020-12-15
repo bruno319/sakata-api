@@ -12,7 +12,6 @@ mod macros;
 mod types;
 mod schema;
 mod dbconfig;
-mod dto;
 mod base_card;
 mod player;
 mod player_card;
@@ -42,6 +41,8 @@ async fn main() -> std::io::Result<()> {
             .service(player::handlers::get_player_by_id)
             .service(player::handlers::buy_common_card)
             .service(player::handlers::buy_star_card)
+            .service(player::handlers::get_party)
+            .service(player::handlers::swap_party_cards)
     })
         .bind("127.0.0.1:8080")
         .unwrap()

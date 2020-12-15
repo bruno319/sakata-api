@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::types::{Class, Domain};
+use crate::types::model::{Class, Domain};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct BaseCardDto {
+pub struct BaseCardJson {
     pub name: String,
     pub class: Class,
     pub domain: Domain,
@@ -12,18 +12,18 @@ pub struct BaseCardDto {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct PlayerDto {
+pub struct PlayerJson {
     pub nickname: String,
     pub discord_id: i64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct AnimeIdsDto {
-    pub anime_mal_ids: Vec<u32>,
+pub struct AnimesJson {
+    pub animes: Vec<u32>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct SwapPartyCards {
-    pub card_in: u32,
-    pub card_out: u32,
+pub struct SwapPartyCardsJson {
+    pub card_in: i32,
+    pub card_out: i32,
 }

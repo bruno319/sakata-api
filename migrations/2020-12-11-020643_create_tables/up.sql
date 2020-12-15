@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `players` (
 );
 
 CREATE TABLE IF NOT EXISTS `player_cards` (
-    `id` INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `id` VARCHAR(36) PRIMARY KEY,
     `base_card_id` INT(11) UNSIGNED NOT NULL,
     `player_id` INT(11) UNSIGNED NOT NULL,
     `rarity` TINYINT NOT NULL,
@@ -26,14 +26,14 @@ CREATE TABLE IF NOT EXISTS `player_cards` (
 );
 
 CREATE TABLE IF NOT EXISTS `party` (
-    `id` INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
     `power` SMALLINT UNSIGNED NOT NULL,
-    `card_1` INT(11) UNSIGNED NOT NULL,
-    `card_2` INT(11) UNSIGNED NOT NULL,
-    `card_3` INT(11) UNSIGNED NOT NULL,
-    `card_4` INT(11) UNSIGNED NOT NULL,
-    `card_5` INT(11) UNSIGNED NOT NULL,
-    FOREIGN KEY(`id`) REFERENCES `players`(`id`),
+    `card_1` VARCHAR(36) NOT NULL,
+    `card_2` VARCHAR(36) NOT NULL,
+    `card_3` VARCHAR(36) NOT NULL,
+    `card_4` VARCHAR(36) NOT NULL,
+    `card_5` VARCHAR(36) NOT NULL,
+    FOREIGN KEY(`id`) REFERENCES `players`(`discord_id`),
     FOREIGN KEY(`card_1`) REFERENCES `player_cards`(`id`),
     FOREIGN KEY(`card_2`) REFERENCES `player_cards`(`id`),
     FOREIGN KEY(`card_3`) REFERENCES `player_cards`(`id`),

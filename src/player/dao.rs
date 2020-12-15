@@ -3,14 +3,14 @@ use diesel::{ExpressionMethods, MysqlConnection, QueryDsl, RunQueryDsl};
 use crate::player::Player;
 use crate::SakataResult;
 
-pub fn save<'a, 'b>(conn: &'b MysqlConnection, player: &'a Player) -> SakataResult<&'a Player> {
+pub fn save(conn: &MysqlConnection, player: &Player) -> SakataResult<Player> {
     use crate::schema::players;
 
     diesel::insert_into(players::table)
         .values(player)
         .execute(conn)?;
 
-    Ok(player)
+    Ok(find_by_discord_id(conn, player.discord_id)?)
 }
 
 pub fn find_by_id(conn: &MysqlConnection, id: u32) -> SakataResult<Player> {

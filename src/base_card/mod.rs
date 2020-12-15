@@ -1,7 +1,6 @@
 use std::thread;
 use std::time::Duration;
 
-use diesel::MysqlConnection;
 use jikan_rs::client::Jikan;
 use jikan_rs::prelude::{Anime, Character};
 use log::*;
@@ -9,16 +8,17 @@ use rand::{Rng, thread_rng};
 use rand::prelude::SliceRandom;
 use serde::{Deserialize, Serialize};
 
-use crate::dto::BaseCardDto;
+use crate::dbconfig::MySqlPooledConnection;
 use crate::error::SakataError;
-use crate::types::{Class, Domain};
 use crate::SakataResult;
 use crate::schema::base_cards;
+use crate::types::json_req::BaseCardJson;
+use crate::types::model::{Class, Domain};
 
-mod dao;
+pub mod dao;
 pub mod handlers;
 
-#[derive(Queryable, Identifiable, Insertable, Serialize, Deserialize, Debug)]
+#[derive(Queryable, Identifiable, Insertable, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct BaseCard {
     pub id: Option<u32>,
     pub name: String,
@@ -29,7 +29,7 @@ pub struct BaseCard {
 }
 
 impl BaseCard {
-    pub fn new(dto: BaseCardDto) -> BaseCard {
+    pub fn new(dto: BaseCardJson) -> BaseCard {
         BaseCard {
             id: None,
             name: dto.name,
@@ -146,17 +146,17 @@ fn calc_overall_score(animes: &Vec<Anime>) -> f32 {
     (mean_score - 5.0) / 0.11
 }
 
-pub fn common_card(conn: &MysqlConnection) -> SakataResult<BaseCard> {
+pub fn common_card(conn: &MySqlPooledConnection) -> SakataResult<BaseCard> {
     let rand = thread_rng().gen_range(0, 100);
     let (min_overall, max_overall) = if rand < 4 {
         (90, 99)
     } else if rand < 16 {
         (80, 89)
     } else {
-        (0, 79)
+        (1, 79)
     };
 
-    let range_cards = dao::list_by_overall_between((min_overall, max_overall), conn)?
+    let range_cards = dao::list_by_overall_between(conn, (min_overall, max_overall))?
         .into_iter()
         .filter_map(|c| c)
         .collect::<Vec<u32>>();
@@ -165,7 +165,7 @@ pub fn common_card(conn: &MysqlConnection) -> SakataResult<BaseCard> {
     dao::find_by_id(conn, *card_id)
 }
 
-pub fn star_card(conn: &MysqlConnection) -> SakataResult<BaseCard> {
+pub fn star_card(conn: &MySqlPooledConnection) -> SakataResult<BaseCard> {
     let rand = thread_rng().gen_range(0, 100);
     let (min_overall, max_overall) = if rand < 20 {
         (95, 99)
@@ -175,7 +175,7 @@ pub fn star_card(conn: &MysqlConnection) -> SakataResult<BaseCard> {
         (85, 89)
     };
 
-    let range_cards = dao::list_by_overall_between((min_overall, max_overall), conn)?
+    let range_cards = dao::list_by_overall_between(conn, (min_overall, max_overall))?
         .into_iter()
         .filter_map(|c| c)
         .collect::<Vec<u32>>();

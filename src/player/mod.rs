@@ -3,9 +3,9 @@ use serde::{Deserialize, Serialize};
 use crate::{base_card, SakataResult};
 use crate::base_card::BaseCard;
 use crate::dbconfig::MySqlPooledConnection;
-use crate::dto::PlayerDto;
 use crate::error::SakataError;
 use crate::schema::players;
+use crate::types::json_req::PlayerJson;
 
 mod dao;
 pub mod handlers;
@@ -21,12 +21,12 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(dto: PlayerDto) -> Player {
+    pub fn new(dto: PlayerJson) -> Player {
         Player {
             id: None,
             discord_id: dto.discord_id,
             nickname: dto.nickname,
-            coins: 300,
+            coins: 350,
             stardust: 50,
         }
     }
