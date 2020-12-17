@@ -15,17 +15,21 @@ pub mod handlers;
 pub struct Player {
     pub id: Option<u32>,
     pub discord_id: i64,
+    pub channel_id: i64,
     pub nickname: String,
+    pub discriminator: u16,
     pub coins: i16,
     pub stardust: i16,
 }
 
 impl Player {
-    pub fn new(dto: PlayerJson) -> Player {
+    pub fn new(json: PlayerJson) -> Player {
         Player {
             id: None,
-            discord_id: dto.discord_id,
-            nickname: dto.nickname,
+            discord_id: json.discord_id,
+            channel_id: json.channel_id,
+            nickname: json.nickname,
+            discriminator: json.discriminator,
             coins: 350,
             stardust: 50,
         }

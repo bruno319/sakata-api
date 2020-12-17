@@ -35,7 +35,9 @@ table! {
     players (id) {
         id -> Nullable<Unsigned<Integer>>,
         discord_id -> Bigint,
+        channel_id -> Bigint,
         nickname -> Varchar,
+        discriminator -> Unsigned<Smallint>,
         coins -> Smallint,
         stardust -> Smallint,
     }

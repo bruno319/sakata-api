@@ -10,7 +10,9 @@ CREATE TABLE IF NOT EXISTS `base_cards` (
 CREATE TABLE IF NOT EXISTS `players` (
     `id`INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `discord_id` BIGINT NOT NULL UNIQUE,
+    `channel_id` BIGINT NOT NULL,
     `nickname` VARCHAR(40) NOT NULL,
+    `discriminator` SMALLINT UNSIGNED NOT NULL,
     `coins` SMALLINT  NOT NULL,
     `stardust` SMALLINT NOT NULL
 );

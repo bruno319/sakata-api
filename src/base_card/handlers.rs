@@ -29,11 +29,11 @@ pub async fn get_card_by_id(
 
 #[post("/basecards")]
 pub async fn create_base_card(
-    base_card_dto: web::Json<BaseCardJson>,
+    base_card_json: web::Json<BaseCardJson>,
     pool: web::Data<MysqlPool>,
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
-    let base_card = BaseCard::new(base_card_dto.0);
+    let base_card = BaseCard::new(base_card_json.0);
     let base_card = dao::save(&mysql_pool, &base_card)?;
     Ok(http_res::created(base_card))
 }

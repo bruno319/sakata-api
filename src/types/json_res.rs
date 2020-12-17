@@ -7,8 +7,10 @@ use crate::player_card::PlayerCard;
 use crate::types::model::{Class, Domain, Rarity};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct FirstPlayerResponse {
+pub struct PlayerJoinedResponse {
     pub discord_id: i64,
+    pub channel_id: i64,
+    pub discriminator: u16,
     pub nickname: String,
     pub coins: i16,
     pub stardust: i16,
@@ -16,16 +18,18 @@ pub struct FirstPlayerResponse {
     pub party: Vec<PlayerCardResponse>,
 }
 
-impl FirstPlayerResponse {
-    pub fn new(player: Player, party: Party) -> FirstPlayerResponse {
+impl PlayerJoinedResponse {
+    pub fn new(player: Player, party: Party) -> PlayerJoinedResponse {
         let party_power = party.power;
         let party = party.cards
             .into_iter()
             .map(|(pc, bc)| PlayerCardResponse::new(pc, bc))
             .collect();
 
-        FirstPlayerResponse {
+        PlayerJoinedResponse {
             discord_id: player.discord_id,
+            channel_id: player.channel_id,
+            discriminator: player.discriminator,
             nickname: player.nickname,
             coins: player.coins,
             stardust: player.stardust,
@@ -34,7 +38,6 @@ impl FirstPlayerResponse {
         }
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PlayerCardResponse {

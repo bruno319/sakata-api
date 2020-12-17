@@ -5,7 +5,7 @@ use crate::dbconfig::MysqlPool;
 use crate::party::Party;
 use crate::player::Player;
 use crate::types::json_req::{PlayerJson, SwapPartyCardsJson};
-use crate::types::json_res::{FirstPlayerResponse, PartyResponse, PlayerCardResponse};
+use crate::types::json_res::{PlayerJoinedResponse, PartyResponse, PlayerCardResponse};
 use crate::utils::{extract_path_param, http_res, mysql_pool_handler};
 
 #[get("/players/{id}")]
@@ -21,11 +21,11 @@ pub async fn get_player_by_id(
 
 #[post("/players")]
 pub async fn create_player(
-    player_dto: web::Json<PlayerJson>,
+    player_json: web::Json<PlayerJson>,
     pool: web::Data<MysqlPool>,
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
-    let mut player = player::dao::save(&mysql_pool, &Player::new(player_dto.0))?;
+    let mut player = player::dao::save(&mysql_pool, &Player::new(player_json.0))?;
 
     let mut initial_cards = Vec::with_capacity(5);
     let mut base_card_ids = Vec::with_capacity(5);
@@ -44,7 +44,7 @@ pub async fn create_player(
     let party = Party::new(player.discord_id, initial_cards);
     party::dao::save(&mysql_pool, &party)?;
 
-    let player_res = FirstPlayerResponse::new(player, party);
+    let player_res = PlayerJoinedResponse::new(player, party);
     Ok(http_res::created(player_res))
 }
 

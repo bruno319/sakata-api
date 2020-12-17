@@ -15,6 +15,8 @@ pub struct BaseCardJson {
 pub struct PlayerJson {
     pub nickname: String,
     pub discord_id: i64,
+    pub channel_id: i64,
+    pub discriminator: u16,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

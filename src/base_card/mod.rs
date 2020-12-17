@@ -29,14 +29,14 @@ pub struct BaseCard {
 }
 
 impl BaseCard {
-    pub fn new(dto: BaseCardJson) -> BaseCard {
+    pub fn new(json: BaseCardJson) -> BaseCard {
         BaseCard {
             id: None,
-            name: dto.name,
-            overall_power: dto.overall_power,
-            class: dto.class,
-            domain: dto.domain,
-            mal_id: dto.mal_id,
+            name: json.name,
+            overall_power: json.overall_power,
+            class: json.class,
+            domain: json.domain,
+            mal_id: json.mal_id,
         }
     }
 }
