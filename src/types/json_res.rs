@@ -43,6 +43,7 @@ impl PlayerJoinedResponse {
 pub struct PlayerCardResponse {
     pub base_card_id: u32,
     pub player_card_id: String,
+    pub mal_id: i32,
     pub name: String,
     pub rarity: Rarity,
     pub class: Class,
@@ -59,11 +60,12 @@ impl PlayerCardResponse {
         PlayerCardResponse {
             base_card_id: base_card.id.unwrap_or_default(),
             player_card_id: player_card.id,
+            mal_id: base_card.mal_id,
             name: base_card.name.clone(),
             rarity: player_card.rarity,
             class: base_card.class,
             domain: base_card.domain,
-            overall_power: base_card.overall_power + player_card.rarity.get_bonus() as u8,
+            overall_power: player_card.overall_power,
             image: image_name,
             quantity: player_card.quantity,
         }

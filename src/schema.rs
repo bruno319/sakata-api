@@ -27,6 +27,7 @@ table! {
         base_card_id -> Unsigned<Integer>,
         player_id -> Unsigned<Integer>,
         rarity -> Tinyint,
+        overall_power -> Unsigned<Tinyint>,
         quantity -> Unsigned<Tinyint>,
     }
 }

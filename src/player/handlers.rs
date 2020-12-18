@@ -4,7 +4,7 @@ use crate::{base_card, party, player, player_card};
 use crate::dbconfig::MysqlPool;
 use crate::party::Party;
 use crate::player::Player;
-use crate::types::json_req::{PlayerJson, SwapPartyCardsJson};
+use crate::types::json_req::{PlayerJson, SwapPartyCardsJson, PlayerCardQuery};
 use crate::types::json_res::{PlayerJoinedResponse, PartyResponse, PlayerCardResponse};
 use crate::utils::{extract_path_param, http_res, mysql_pool_handler};
 
@@ -74,6 +74,20 @@ pub async fn buy_star_card(
     let base_card = player.buy_star_card(&mysql_pool)?;
     let player_card = player_card::add_to_collection(&player, &base_card, &mysql_pool)?;
     Ok(http_res::ok(PlayerCardResponse::new(player_card, base_card)))
+}
+
+#[get("/players/{discord_id}/cards")]
+pub async fn query_player_cards(
+    req: HttpRequest,
+    query: web::Query<PlayerCardQuery>,
+    pool: web::Data<MysqlPool>,
+) -> Result<HttpResponse, HttpResponse> {
+    let mysql_pool = mysql_pool_handler(pool)?;
+    let player_id = extract_path_param("discord_id", &req)?;
+    let player = player::dao::find_by_discord_id(&mysql_pool, player_id)?;
+    let cards = player_card::query(player, query.0, &mysql_pool)?;
+
+    Ok(HttpResponse::Ok().json(cards))
 }
 
 #[get("/players/{discord_id}/party")]

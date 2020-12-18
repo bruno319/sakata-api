@@ -92,8 +92,8 @@ impl Party {
 
     fn calculate_party_power(&mut self) {
         let ov_power_sum = self.cards.iter()
-            .fold(0, |sum, (pc, bc)| {
-                sum + bc.overall_power as u16 + pc.rarity.get_bonus()
+            .fold(0, |sum, (pc, _)| {
+                sum as u16 + pc.overall_power as u16
             });
 
         self.power = ov_power_sum;

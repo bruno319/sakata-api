@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS `player_cards` (
     `base_card_id` INT(11) UNSIGNED NOT NULL,
     `player_id` INT(11) UNSIGNED NOT NULL,
     `rarity` TINYINT NOT NULL,
+    `overall_power` TINYINT UNSIGNED NOT NULL,
     `quantity` TINYINT UNSIGNED NOT NULL,
     FOREIGN KEY(`base_card_id`) REFERENCES `base_cards`(`id`),
     FOREIGN KEY(`player_id`) REFERENCES `players`(`id`)

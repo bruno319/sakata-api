@@ -1,8 +1,8 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize};
 
 use crate::types::model::{Class, Domain};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct BaseCardJson {
     pub name: String,
     pub class: Class,
@@ -11,7 +11,7 @@ pub struct BaseCardJson {
     pub overall_power: u8,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct PlayerJson {
     pub nickname: String,
     pub discord_id: i64,
@@ -19,13 +19,20 @@ pub struct PlayerJson {
     pub discriminator: u16,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct AnimesJson {
     pub animes: Vec<u32>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct SwapPartyCardsJson {
     pub card_in: i32,
     pub card_out: i32,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct PlayerCardQuery {
+    pub class: Option<i8>,
+    pub domain: Option<i8>,
+    pub page: u16,
 }

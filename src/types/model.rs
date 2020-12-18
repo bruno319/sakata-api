@@ -56,7 +56,7 @@ impl_tinyint_sql_op!(Domain);
 impl_tinyint_sql_op!(Rarity);
 
 impl Rarity {
-    pub fn get_bonus(&self) -> u16 {
+    pub fn get_bonus(&self) -> u8 {
         match self {
             Rarity::Unknown => 0,
             Rarity::Silver => 0,

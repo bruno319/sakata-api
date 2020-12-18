@@ -41,6 +41,7 @@ async fn main() -> std::io::Result<()> {
             .service(player::handlers::get_player_by_id)
             .service(player::handlers::buy_common_card)
             .service(player::handlers::buy_star_card)
+            .service(player::handlers::query_player_cards)
             .service(player::handlers::get_party)
             .service(player::handlers::swap_party_cards)
     })

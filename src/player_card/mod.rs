@@ -7,11 +7,13 @@ use crate::dbconfig::MySqlPooledConnection;
 use crate::player::Player;
 use crate::SakataResult;
 use crate::schema::player_cards;
-use crate::types::model::Rarity;
+use crate::types::model::{Rarity, Domain, Class};
+use crate::types::json_req::PlayerCardQuery;
+use crate::types::json_res::PlayerCardResponse;
 
 pub mod dao;
 
-#[derive(Queryable, QueryableByName, Identifiable, Insertable, Associations, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
+#[derive(Queryable, Identifiable, Insertable, Associations, Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 #[table_name = "player_cards"]
 #[belongs_to(Player, foreign_key = "id")]
 #[belongs_to(BaseCard, foreign_key = "id")]
@@ -20,6 +22,7 @@ pub struct PlayerCard {
     pub base_card_id: u32,
     pub player_id: u32,
     pub rarity: Rarity,
+    pub overall_power: u8,
     pub quantity: u8,
 }
 
@@ -30,6 +33,7 @@ impl PlayerCard {
             base_card_id: base_card.id.unwrap(),
             player_id: player.id.unwrap(),
             rarity,
+            overall_power: base_card.overall_power + rarity.get_bonus(),
             quantity: 1,
         }
     }
@@ -67,4 +71,24 @@ pub fn add_to_collection(player: &Player, base_card: &BaseCard, conn: &MySqlPool
     dao::save(&player, conn)?;
 
     Ok(player)
+}
+
+pub fn query(player: Player, query: PlayerCardQuery, conn: &MySqlPooledConnection) -> SakataResult<Vec<PlayerCardResponse>> {
+    let domain: Option<Domain> = match query.domain {
+        None => None,
+        Some(d) => serde_json::from_str(&d.to_string()).unwrap_or(None)
+    };
+
+    let class: Option<Class> = match query.class {
+        None => None,
+        Some(d) => serde_json::from_str(&d.to_string()).unwrap_or(None)
+    };
+
+    let cards = dao::query(player.id.unwrap(), query.page, class, domain, conn)?;
+
+    let response_cards = cards.into_iter()
+        .map(|(pc, bc)| PlayerCardResponse::new(pc, bc))
+        .collect();
+
+    Ok(response_cards)
 }
