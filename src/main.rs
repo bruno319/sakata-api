@@ -34,6 +34,7 @@ async fn main() -> std::io::Result<()> {
             .data(connect())
             .service(base_card::handlers::save_image_card)
             .service(base_card::handlers::get_cards)
+            .service(base_card::handlers::verify_inserted)
             .service(base_card::handlers::create_base_card)
             .service(base_card::handlers::generate_overall_power)
             .service(base_card::handlers::get_card_by_id)

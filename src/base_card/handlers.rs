@@ -27,6 +27,16 @@ pub async fn get_card_by_id(
     Ok(http_res::ok(base_card))
 }
 
+#[post("/basecards/created")]
+pub async fn verify_inserted(
+    animes: web::Json<Vec<i32>>,
+    pool: web::Data<MysqlPool>,
+) -> Result<HttpResponse, HttpResponse> {
+    let mysql_pool = mysql_pool_handler(pool)?;
+    let animes_inserted = dao::verify_inserted(&mysql_pool, animes.0)?;
+    Ok(http_res::ok(animes_inserted))
+}
+
 #[post("/basecards")]
 pub async fn create_base_card(
     base_card_json: web::Json<BaseCardJson>,

@@ -5,6 +5,16 @@ use crate::SakataResult;
 
 use super::BaseCard;
 
+pub fn save<'a, 'b>(conn: &'b MySqlPooledConnection, base_card: &'a BaseCard) -> SakataResult<&'a BaseCard> {
+    use crate::schema::base_cards;
+
+    diesel::insert_into(base_cards::table)
+        .values(base_card)
+        .execute(conn)?;
+
+    Ok(base_card)
+}
+
 pub fn list(conn: &MySqlPooledConnection) -> SakataResult<Vec<BaseCard>> {
     use crate::schema::base_cards::dsl::*;
 
@@ -45,13 +55,17 @@ pub fn find_by_mal_id(conn: &MySqlPooledConnection, id: i32) -> SakataResult<Bas
     Ok(card)
 }
 
-pub fn save<'a, 'b>(conn: &'b MySqlPooledConnection, base_card: &'a BaseCard) -> SakataResult<&'a BaseCard> {
-    use crate::schema::base_cards;
+pub fn verify_inserted(conn: &MySqlPooledConnection, mal_id_list: Vec<i32>) -> SakataResult<Vec<i32>> {
+    use crate::schema::base_cards::dsl::{base_cards, mal_id};
 
-    diesel::insert_into(base_cards::table)
-        .values(base_card)
-        .execute(conn)?;
+    if mal_id_list.is_empty() {
+        return Ok(Vec::with_capacity(0));
+    }
 
-    Ok(base_card)
+    let result = base_cards
+        .select(mal_id)
+        .filter(mal_id.eq_any(mal_id_list))
+        .load(conn)?;
+
+    Ok(result)
 }
-

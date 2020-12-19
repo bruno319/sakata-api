@@ -87,7 +87,7 @@ pub async fn query_player_cards(
     let player = player::dao::find_by_discord_id(&mysql_pool, player_id)?;
     let cards = player_card::query(player, query.0, &mysql_pool)?;
 
-    Ok(HttpResponse::Ok().json(cards))
+    Ok(http_res::ok(cards))
 }
 
 #[get("/players/{discord_id}/party")]
@@ -98,7 +98,7 @@ pub async fn get_party(
     let mysql_pool = mysql_pool_handler(pool)?;
     let player_id = extract_path_param("discord_id", &req)?;
     let party = party::dao::find_by_discord_id(&mysql_pool, player_id)?;
-    Ok(HttpResponse::Ok().json(PartyResponse::new(party)))
+    Ok(http_res::ok(PartyResponse::new(party)))
 }
 
 #[post("/players/{discord_id}/party/swap")]
@@ -117,5 +117,5 @@ pub async fn swap_party_cards(
     party.swap(card_in, card_out, player, &mysql_pool)?;
     party::dao::update(&mysql_pool, &party)?;
 
-    Ok(HttpResponse::Ok().json(PartyResponse::new(party)))
+    Ok(http_res::ok(PartyResponse::new(party)))
 }
