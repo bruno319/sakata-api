@@ -5,7 +5,7 @@ use actix_cors::Cors;
 use actix_web::{App, HttpServer};
 use actix_web::middleware::Logger;
 
-use crate::dbconfig::connect;
+use crate::base_card::drawer::BaseCardDrawer;
 
 #[macro_use]
 mod macros;
@@ -28,10 +28,15 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
 
     HttpServer::new(|| {
+        let conn = dbconfig::connect();
+        let drawer = BaseCardDrawer::new(&conn.get().unwrap())
+            .expect("Cannot fetch card data in mysql");
+
         App::new()
             .wrap(Logger::default())
             .wrap(Cors::permissive())
-            .data(connect())
+            .data(conn)
+            .data(drawer)
             .service(base_card::handlers::save_image_card)
             .service(base_card::handlers::get_cards)
             .service(base_card::handlers::verify_inserted)

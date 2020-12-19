@@ -7,9 +7,9 @@ use crate::dbconfig::MySqlPooledConnection;
 use crate::player::Player;
 use crate::SakataResult;
 use crate::schema::player_cards;
-use crate::types::model::{Rarity, Domain, Class};
 use crate::types::json_req::PlayerCardQuery;
 use crate::types::json_res::PlayerCardResponse;
+use crate::types::model::{Class, Domain, Rarity};
 
 pub mod dao;
 

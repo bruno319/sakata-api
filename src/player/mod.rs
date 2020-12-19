@@ -1,9 +1,11 @@
+use actix_web::web;
 use serde::{Deserialize, Serialize};
 
-use crate::{base_card, SakataResult};
-use crate::base_card::BaseCard;
+use crate::{base_card, player_card, SakataResult};
+use crate::base_card::{BaseCard, rawer::BaseCardDrawer};
 use crate::dbconfig::MySqlPooledConnection;
 use crate::error::SakataError;
+use crate::player_card::PlayerCard;
 use crate::schema::players;
 use crate::types::json_req::PlayerJson;
 
@@ -35,25 +37,27 @@ impl Player {
         }
     }
 
-    pub fn buy_common_card(&mut self, conn: &MySqlPooledConnection) -> SakataResult<BaseCard> {
+    pub fn buy_common_card(&mut self, drawer: &web::Data<BaseCardDrawer>, conn: &MySqlPooledConnection) -> SakataResult<(PlayerCard, BaseCard)> {
         if self.coins < 50 {
             return Err(SakataError::NotEnoughResource("Insufficient Coins".to_string()));
         }
-
         self.coins -= 50;
         dao::update_coins(&self, conn)?;
 
-        base_card::common_card(&conn)
+        let base_card = base_card::dao::find_by_id(conn, drawer.common_card())?;
+        let player_card = player_card::add_to_collection(self, &base_card, conn)?;
+        Ok((player_card, base_card))
     }
 
-    pub fn buy_star_card(&mut self, conn: &MySqlPooledConnection) -> SakataResult<BaseCard> {
+    pub fn buy_star_card(&mut self, drawer: &web::Data<BaseCardDrawer>, conn: &MySqlPooledConnection) -> SakataResult<(PlayerCard, BaseCard)> {
         if self.stardust < 50 {
             return Err(SakataError::NotEnoughResource("Insufficient Stardust".to_string()));
         }
-
         self.stardust -= 50;
         dao::update_stardust(&self, conn)?;
 
-        base_card::star_card(&conn)
+        let base_card = base_card::dao::find_by_id(conn, drawer.star_card())?;
+        let player_card = player_card::add_to_collection(self, &base_card, conn)?;
+        Ok((player_card, base_card))
     }
 }

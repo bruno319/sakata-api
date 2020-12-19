@@ -25,11 +25,11 @@ pub fn list(conn: &MySqlPooledConnection) -> SakataResult<Vec<BaseCard>> {
     Ok(cards)
 }
 
-pub fn list_by_overall_between(conn: &MySqlPooledConnection, (min, max): (u8, u8)) -> SakataResult<Vec<Option<u32>>> {
+pub fn list_id_and_overall(conn: &MySqlPooledConnection) -> SakataResult<Vec<(Option<u32>, u8)>> {
     use crate::schema::base_cards::dsl::*;
 
-    let cards = base_cards.select(id)
-        .filter(overall_power.between(min - 1, max + 1))
+    let cards = base_cards
+        .select((id, overall_power))
         .load(conn)?;
 
     Ok(cards)

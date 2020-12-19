@@ -4,11 +4,8 @@ use std::time::Duration;
 use jikan_rs::client::Jikan;
 use jikan_rs::prelude::{Anime, Character};
 use log::*;
-use rand::{Rng, thread_rng};
-use rand::prelude::SliceRandom;
 use serde::{Deserialize, Serialize};
 
-use crate::dbconfig::MySqlPooledConnection;
 use crate::error::SakataError;
 use crate::SakataResult;
 use crate::schema::base_cards;
@@ -17,6 +14,7 @@ use crate::types::model::{Class, Domain};
 
 pub mod dao;
 pub mod handlers;
+pub mod drawer;
 
 #[derive(Queryable, Identifiable, Insertable, Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct BaseCard {
@@ -106,10 +104,10 @@ async fn find_animes_from_mal_id(jikan: &Jikan, mal_ids: Vec<u32>) -> Vec<Anime>
 
 fn calc_overall_member_favorites(members: u32) -> f32 {
     match members {
-        0..=1000 => (members as f32 / 200.0) + 15.0,
-        1001..=5000 => (members as f32 - 1000.0) / 800.0 + 20.0,
-        5001..=25000 => (members as f32 - 5000.0) / 4000.0 + 25.0,
-        25001..=50000 => (members as f32 - 25000.0) / 5000.0 + 30.0,
+        0..=1000 => (members as f32 / 200.0) + 18.0,
+        1001..=5000 => (members as f32 - 1000.0) / 800.0 + 24.0,
+        5001..=25000 => (members as f32 - 5000.0) / 4000.0 + 28.0,
+        25001..=50000 => (members as f32 - 25000.0) / 5000.0 + 32.0,
         _ => 35.0
     }
 }
@@ -143,43 +141,5 @@ fn calc_overall_score(animes: &Vec<Anime>) -> f32 {
     let mean_score = animes.iter()
         .sum::<f32>() / quantity as f32;
 
-    (mean_score - 5.0) / 0.11
-}
-
-pub fn common_card(conn: &MySqlPooledConnection) -> SakataResult<BaseCard> {
-    let rand = thread_rng().gen_range(0, 100);
-    let (min_overall, max_overall) = if rand < 4 {
-        (90, 99)
-    } else if rand < 16 {
-        (80, 89)
-    } else {
-        (1, 79)
-    };
-
-    let range_cards = dao::list_by_overall_between(conn, (min_overall, max_overall))?
-        .into_iter()
-        .filter_map(|c| c)
-        .collect::<Vec<u32>>();
-
-    let card_id = range_cards.choose(&mut thread_rng()).unwrap();
-    dao::find_by_id(conn, *card_id)
-}
-
-pub fn star_card(conn: &MySqlPooledConnection) -> SakataResult<BaseCard> {
-    let rand = thread_rng().gen_range(0, 100);
-    let (min_overall, max_overall) = if rand < 20 {
-        (95, 99)
-    } else if rand < 60 {
-        (90, 94)
-    } else {
-        (85, 89)
-    };
-
-    let range_cards = dao::list_by_overall_between(conn, (min_overall, max_overall))?
-        .into_iter()
-        .filter_map(|c| c)
-        .collect::<Vec<u32>>();
-
-    let card_id = range_cards.choose(&mut thread_rng()).unwrap();
-    dao::find_by_id(conn, *card_id)
+    (mean_score - 5.0) / 0.106
 }

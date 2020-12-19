@@ -5,7 +5,7 @@ use crate::dbconfig::MySqlPooledConnection;
 use crate::player::Player;
 use crate::player_card::PlayerCard;
 use crate::SakataResult;
-use crate::types::model::{Domain, Class};
+use crate::types::model::{Class, Domain};
 
 pub fn save<'a, 'b>(player_card: &'a PlayerCard, conn: &'b MySqlPooledConnection) -> SakataResult<&'a PlayerCard> {
     use crate::schema::player_cards;
@@ -30,7 +30,7 @@ pub fn find_by(player: &Player, base_card: &BaseCard, conn: &MySqlPooledConnecti
     Ok(cards)
 }
 
-pub fn filter_by_list_id(ids: Vec<String>, conn: &MySqlPooledConnection) -> SakataResult<Vec<(PlayerCard, BaseCard)>> {
+pub fn filter_by_list_id(id_list: Vec<String>, conn: &MySqlPooledConnection) -> SakataResult<Vec<(PlayerCard, BaseCard)>> {
     // "SELECT * FROM player_cards INNER JOIN base_cards WHERE id IN {}";
     use crate::schema::player_cards::dsl::player_cards;
     use crate::schema::player_cards::columns::id;
@@ -38,7 +38,7 @@ pub fn filter_by_list_id(ids: Vec<String>, conn: &MySqlPooledConnection) -> Saka
 
     let cards = player_cards
         .inner_join(base_cards::table)
-        .filter(id.eq_any(ids))
+        .filter(id.eq_any(id_list))
         .load(conn)?;
 
     Ok(cards)
@@ -79,4 +79,13 @@ pub fn update_quantity<'a, 'b>(player_card: &'a PlayerCard, conn: &'b MySqlPoole
         .execute(conn)?;
 
     Ok(player_card)
+}
+
+pub fn remove_by_id(p_id: String, conn: &MySqlPooledConnection) -> SakataResult<()> {
+    use crate::schema::player_cards::dsl::*;
+
+    diesel::delete(player_cards.filter(id.eq(p_id)))
+        .execute(conn)?;
+
+    Ok(())
 }

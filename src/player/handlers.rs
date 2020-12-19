@@ -1,11 +1,12 @@
 use actix_web::{get, HttpRequest, HttpResponse, post, web};
 
 use crate::{base_card, party, player, player_card};
+use crate::base_card::drawer::BaseCardDrawer;
 use crate::dbconfig::MysqlPool;
 use crate::party::Party;
 use crate::player::Player;
-use crate::types::json_req::{PlayerJson, SwapPartyCardsJson, PlayerCardQuery};
-use crate::types::json_res::{PlayerJoinedResponse, PartyResponse, PlayerCardResponse};
+use crate::types::json_req::{PlayerCardQuery, PlayerJson, SwapPartyCardsJson};
+use crate::types::json_res::{PartyResponse, PlayerCardResponse, PlayerJoinedResponse};
 use crate::utils::{extract_path_param, http_res, mysql_pool_handler};
 
 #[get("/players/{id}")]
@@ -22,23 +23,24 @@ pub async fn get_player_by_id(
 #[post("/players")]
 pub async fn create_player(
     player_json: web::Json<PlayerJson>,
+    drawer: web::Data<BaseCardDrawer>,
     pool: web::Data<MysqlPool>,
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
     let mut player = player::dao::save(&mysql_pool, &Player::new(player_json.0))?;
 
     let mut initial_cards = Vec::with_capacity(5);
-    let mut base_card_ids = Vec::with_capacity(5);
+    let mut bc_id_list = Vec::with_capacity(5);
     while initial_cards.len() < 5 {
-        let base_card = player.buy_common_card(&mysql_pool)?;
-        if base_card_ids.contains(&base_card.id.unwrap()) {
+        let (pc, bc) = player.buy_common_card(&drawer, &mysql_pool)?;
+        if bc_id_list.contains(&bc.id.unwrap()) {
             player.coins += 50;
             player::dao::update_coins(&player, &mysql_pool)?;
+            player_card::dao::remove_by_id(pc.id, &mysql_pool)?;
             continue;
         };
-        base_card_ids.push(base_card.id.unwrap());
-        let player_card = player_card::add_to_collection(&player, &base_card, &mysql_pool)?;
-        initial_cards.push((player_card, base_card));
+        bc_id_list.push(bc.id.unwrap());
+        initial_cards.push((pc, bc));
     }
 
     let party = Party::new(player.discord_id, initial_cards);
@@ -51,28 +53,28 @@ pub async fn create_player(
 #[get("/players/{discord_id}/common-card")]
 pub async fn buy_common_card(
     req: HttpRequest,
+    drawer: web::Data<BaseCardDrawer>,
     pool: web::Data<MysqlPool>,
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
     let player_id = extract_path_param("discord_id", &req)?;
     let mut player = player::dao::find_by_discord_id(&mysql_pool, player_id)?;
 
-    let base_card = player.buy_common_card(&mysql_pool)?;
-    let player_card = player_card::add_to_collection(&player, &base_card, &mysql_pool)?;
+    let (player_card, base_card) = player.buy_common_card(&drawer, &mysql_pool)?;
     Ok(http_res::ok(PlayerCardResponse::new(player_card, base_card)))
 }
 
 #[get("/players/{discord_id}/star-card")]
 pub async fn buy_star_card(
     req: HttpRequest,
+    drawer: web::Data<BaseCardDrawer>,
     pool: web::Data<MysqlPool>,
 ) -> Result<HttpResponse, HttpResponse> {
     let mysql_pool = mysql_pool_handler(pool)?;
     let player_id = extract_path_param("discord_id", &req)?;
     let mut player = player::dao::find_by_discord_id(&mysql_pool, player_id)?;
 
-    let base_card = player.buy_star_card(&mysql_pool)?;
-    let player_card = player_card::add_to_collection(&player, &base_card, &mysql_pool)?;
+    let (player_card, base_card) = player.buy_star_card(&drawer, &mysql_pool)?;
     Ok(http_res::ok(PlayerCardResponse::new(player_card, base_card)))
 }
 
