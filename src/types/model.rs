@@ -16,13 +16,14 @@ pub enum Class {
     Magician = 2,
     Swordsman = 3,
     Ranger = 4,
-    Support = 5,
-    Beast = 6,
-    Machinist = 7,
-    Supernatural = 8,
-    Scholar = 9,
-    Worker = 10,
-    Musician = 11,
+    Rogue = 5,
+    Support = 6,
+    Beast = 7,
+    Machinist = 8,
+    Supernatural = 9,
+    Scholar = 10,
+    Worker = 11,
+    Musician = 12,
 }
 
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, AsExpression, FromSqlRow, Clone, Copy)]
@@ -32,12 +33,13 @@ pub enum Domain {
     Unknown = -1,
     Action = 1,
     Adventure = 2,
-    SciFi = 3,
-    Sports = 4,
-    Mystery = 5,
-    SliceOfLife = 6,
-    Comedy = 7,
-    Romance = 8,
+    Fantasy = 3,
+    SciFi = 4,
+    Sports = 5,
+    Mystery = 6,
+    SliceOfLife = 7,
+    Comedy = 8,
+    Romance = 9,
 }
 
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Eq, PartialOrd, Ord, Debug, AsExpression, FromSqlRow, Clone, Copy)]
@@ -105,6 +107,7 @@ impl ToString for Class {
             Class::Magician => "Magician".to_string(),
             Class::Swordsman => "Swordsman".to_string(),
             Class::Ranger => "Ranger".to_string(),
+            Class::Rogue => "Rogue".to_string(),
             Class::Support => "Support".to_string(),
             Class::Beast => "Beast".to_string(),
             Class::Machinist => "Machinist".to_string(),
@@ -122,6 +125,7 @@ impl ToString for Domain {
         match self {
             Domain::Action => "Action".to_string(),
             Domain::Adventure => "Adventure".to_string(),
+            Domain::Fantasy => "Fantasy".to_string(),
             Domain::SciFi => "Sci-Fi".to_string(),
             Domain::Sports => "Sports".to_string(),
             Domain::Mystery => "Mystery".to_string(),
