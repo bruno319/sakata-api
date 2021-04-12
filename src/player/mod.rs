@@ -2,7 +2,7 @@ use actix_web::web;
 use serde::{Deserialize, Serialize};
 
 use crate::{base_card, player_card, SakataResult};
-use crate::base_card::{BaseCard, rawer::BaseCardDrawer};
+use crate::base_card::{BaseCard, drawer::BaseCardDrawer};
 use crate::dbconfig::MySqlPooledConnection;
 use crate::error::SakataError;
 use crate::player_card::PlayerCard;
