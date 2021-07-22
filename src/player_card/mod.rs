@@ -40,13 +40,13 @@ impl PlayerCard {
 }
 
 fn generate_rarity() -> Rarity {
-    let rand = thread_rng().gen_range(0, 101);
+    let rand = thread_rng().gen_range(0, 100);
 
-    if rand < 5 {
+    if rand < 10 {
         Rarity::Legend
-    } else if rand < 15 {
+    } else if rand < 30 {
         Rarity::Epic
-    } else if rand < 50 {
+    } else if rand < 60 {
         Rarity::Gold
     } else {
         Rarity::Silver

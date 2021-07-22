@@ -40,13 +40,13 @@ impl BaseCardDrawer {
 
     pub fn common_card(&self) -> u32 {
         let rand = thread_rng().gen_range(0, 100);
-        let vec_to_choose = if rand < 1 {
+        let vec_to_choose = if rand < 2 {
             &self.cards_95plus
-        } else if rand < 3 {
+        } else if rand < 5 {
             &self.cards_90plus
-        } else if rand < 7 {
+        } else if rand < 10 {
             &self.cards_85plus
-        } else if rand < 14 {
+        } else if rand < 20 {
             &self.cards_80plus
         } else {
             &self.remaining_cards

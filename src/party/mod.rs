@@ -7,6 +7,7 @@ use crate::error::SakataError;
 use crate::player::Player;
 use crate::player_card::PlayerCard;
 use crate::schema::party;
+use std::collections::HashMap;
 
 pub mod dao;
 
@@ -91,11 +92,42 @@ impl Party {
     }
 
     fn calculate_party_power(&mut self) {
-        let ov_power_sum = self.cards.iter()
-            .fold(0, |sum, (pc, _)| {
-                sum as u16 + pc.overall_power as u16
-            });
+        let ov_power_sum = self.cards
+            .iter()
+            .fold(0, |sum, (pc, _)| sum as u16 + pc.overall_power as u16);
 
-        self.power = ov_power_sum;
+        let class_multiplier = calc_match_multiplier(self.cards
+            .iter()
+            .map(|(_, bc)| bc.class as i8));
+
+        let domain_multiplier = calc_match_multiplier(self.cards
+            .iter()
+            .map(|(_, bc)| bc.domain as i8));
+
+        self.power = (ov_power_sum as f32 * (1.0 + class_multiplier + domain_multiplier)) as u16;
+    }
+}
+
+fn calc_match_multiplier<I: Iterator<Item=i8>>(item_matches: I) -> f32 {
+    item_matches
+        .fold(HashMap::with_capacity(5), |mut map, item| {
+            if map.contains_key(&item) {
+                map.insert(item, map.get(&item).unwrap() + 1);
+            } else {
+                map.insert(item, 1);
+            };
+            map
+        })
+        .values()
+        .fold(0.0, |mul, matches| mul + synergy_bonus_for(*matches))
+}
+
+fn synergy_bonus_for(quantity: u8) -> f32 {
+    match quantity {
+        5 => 0.09,
+        4 => 0.075,
+        3 => 0.035,
+        2 => 0.015,
+        _ => 0.0
     }
 }
